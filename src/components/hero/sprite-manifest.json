@@ -1,0 +1,13 @@
+{
+  "frames": 0,
+  "frameWidth": 0,
+  "frameHeight": 0,
+  "idle": 0,
+  "left": 0,
+  "right": 0,
+  "blink": [],
+  "sheet": "/hero/sheet.webp",
+  "fallback": "/hero/idle.webp",
+  "generated": null,
+  "note": "frames = 0 means the vector placeholder is used. Run `python3 scripts/build-hero-sheet.py <clip.mp4>` to generate real frames."
+}

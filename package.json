@@ -9,13 +9,21 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.136.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource/itim": "^5.3.0",
+    "@fontsource/mitr": "^5.3.0",
+    "@fontsource/sarabun": "^5.3.0",
     "next": "16.4.2",
+    "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "resend": "^6.34.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
