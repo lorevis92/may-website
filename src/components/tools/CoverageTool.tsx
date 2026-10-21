@@ -34,7 +34,7 @@ export function CoverageTool() {
               <p className="font-heading text-4xl sm:text-5xl font-medium text-ink">{fmtTHB(r.recommended, locale)}</p>
               <p className="mt-2 text-ink-soft">{r.recommended > 0 ? c.resultBody : c.covered}</p>
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <Stat label={c.needs} value={fmtTHB(r.needs, locale, { compact: true })} tone="rose" />
+                <Stat label={c.needs} value={fmtTHB(r.needs, locale, { compact: true })} tone="jasmine" />
                 <Stat label={c.has} value={fmtTHB(r.has, locale, { compact: true })} tone="sage" />
               </div>
               <details className="mt-4 text-sm">

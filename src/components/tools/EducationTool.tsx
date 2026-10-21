@@ -47,7 +47,7 @@ export function EducationTool() {
               <p className="mt-1 text-sm text-ink-muted">{c.inYears.replace("{n}", String(r.yearsUntil))}</p>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Stat label={`${c.monthlyNeeded} · ${c.startNow}`} value={fmtTHB(r.monthlyNow, locale)} tone="sage" sub={t.common.perMonth} />
-                <Stat label={`${c.monthlyNeeded} · ${c.startLater}`} value={r.yearsUntil > 3 ? fmtTHB(r.monthlyIn3Years, locale) : "—"} tone="rose" sub={t.common.perMonth} />
+                <Stat label={`${c.monthlyNeeded} · ${c.startLater}`} value={r.yearsUntil > 3 ? fmtTHB(r.monthlyIn3Years, locale) : "—"} tone="jasmine" sub={t.common.perMonth} />
               </div>
               <p className="note mt-5 text-[15px]">{c.payorNote}</p>
               <Disclaimer />

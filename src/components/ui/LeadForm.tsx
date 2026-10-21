@@ -67,7 +67,7 @@ export function LeadForm({ source, title, body, payload, buttonLabel, compact, c
   if (state === "done") {
     return (
       <div className={cx("card p-6 sm:p-8 text-center", className)}>
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-sage-soft text-sage-deep">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-jasmine-mist text-jasmine-deep">
           <Icon name="check" className="h-6 w-6" />
         </div>
         <h3 className="mt-4 text-xl font-medium">{t.common.thanksTitle}</h3>
@@ -78,11 +78,11 @@ export function LeadForm({ source, title, body, payload, buttonLabel, compact, c
 
   const label = "block text-sm font-heading text-ink-soft mb-1.5";
   const input =
-    "w-full rounded-2xl border border-line bg-white px-4 py-3 text-ink placeholder:text-ink-muted/70 focus:outline-none focus:border-ink focus:ring-4 focus:ring-rose/15 transition";
+    "w-full rounded-[var(--radius-control)] border border-line bg-white px-4 py-3 text-ink placeholder:text-ink-muted/70 focus:outline-none focus:border-jasmine focus:ring-4 focus:ring-jasmine/15 transition";
 
   return (
     <form onSubmit={submit} className={cx("card p-6 sm:p-8", className)} noValidate>
-      {title && <h3 className="text-xl sm:text-2xl font-medium">{title}</h3>}
+      {title && <h3 className="text-xl sm:text-[1.625rem] font-medium">{title}</h3>}
       {body && <p className="mt-2 text-ink-soft">{body}</p>}
       {payload && !compact && <p className="mt-2 text-xs text-ink-muted">{t.leadForm.includeResult}</p>}
 
@@ -127,10 +127,10 @@ export function LeadForm({ source, title, body, payload, buttonLabel, compact, c
           </label>
         </div>
         <label className="flex items-start gap-3 text-sm text-ink-soft">
-          <input type="checkbox" name="consent" required className="mt-1 h-4 w-4 accent-rose" />
+          <input type="checkbox" name="consent" required className="mt-1 h-4 w-4 accent-jasmine" />
           <span>
             {t.common.consent}
-            <Link href={href("/privacy", locale)} className="underline underline-offset-2 hover:text-ink">
+            <Link href={href("/privacy", locale)} className="text-jasmine-deep underline decoration-jasmine/30 underline-offset-2 hover:decoration-jasmine">
               {t.common.consentLink}
             </Link>
             .
@@ -139,7 +139,7 @@ export function LeadForm({ source, title, body, payload, buttonLabel, compact, c
       </div>
 
       {state === "error" && (
-        <p className="mt-4 rounded-xl bg-rose-soft px-4 py-2 text-sm text-rose-deep">
+        <p className="mt-4 rounded-[var(--radius-control)] bg-clay-soft px-4 py-2 text-sm text-clay">
           {error === "no_contact" ? (locale === "th" ? "กรุณากรอกอีเมล LINE หรือเบอร์โทรอย่างน้อยหนึ่งอย่างค่ะ" : "Please leave at least an email, LINE ID or phone number.") : t.common.errorGeneric}
         </p>
       )}

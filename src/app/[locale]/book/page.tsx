@@ -21,7 +21,7 @@ export default async function BookPage({ params }: PageProps<"/[locale]/book">) 
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
           <Eyebrow>{t.nav.book}</Eyebrow>
-          <h1 className="text-4xl sm:text-5xl font-medium leading-tight">{t.book.title}</h1>
+          <h1 className="text-[2.5rem] sm:text-[3.25rem] font-medium">{t.book.title}</h1>
           <p className="mt-5 text-lg text-ink-soft leading-relaxed">{t.book.subtitle}</p>
           <p className="note mt-8">{t.book.promise}</p>
           {site.contact.lineUrl && (

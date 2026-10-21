@@ -68,7 +68,7 @@ export function QuizTool() {
         <div className="card p-6 sm:p-10 max-w-2xl">
           <div className="flex items-center gap-2" aria-hidden>
             {c.questions.map((_, i) => (
-              <span key={i} className={cx("h-1.5 flex-1 rounded-full transition-colors", i < step ? "bg-rose" : i === step ? "bg-ink" : "bg-paper-3")} />
+              <span key={i} className={cx("h-1.5 flex-1 rounded-full transition-colors", i < step ? "bg-jasmine" : i === step ? "bg-jasmine-bright/50" : "bg-paper-2")} />
             ))}
           </div>
           <p className="mt-6 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">
@@ -82,8 +82,8 @@ export function QuizTool() {
                 type="button"
                 onClick={() => choose(i)}
                 className={cx(
-                  "group flex items-center justify-between rounded-2xl border px-5 py-3.5 text-left font-heading text-[16px] transition",
-                  answers[step] === i ? "border-ink bg-ink text-white" : "border-line bg-white hover:border-ink hover:-translate-y-0.5",
+                  "group flex items-center justify-between rounded-xl border px-5 py-3.5 text-left font-heading text-[16px] transition",
+                  answers[step] === i ? "border-jasmine bg-jasmine-mist text-jasmine-ink" : "border-line bg-white hover:border-line-strong hover:bg-paper/60",
                 )}
               >
                 {o}
@@ -107,7 +107,7 @@ export function QuizTool() {
               <ol className="mt-2 space-y-2">
                 {profile.priorities.map((p, i) => (
                   <li key={p} className="flex gap-3">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-white font-heading text-xs">{i + 1}</span>
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-jasmine-soft bg-jasmine-mist text-jasmine-deep font-heading text-xs font-semibold">{i + 1}</span>
                     <span>{p}</span>
                   </li>
                 ))}
@@ -115,7 +115,7 @@ export function QuizTool() {
               <h4 className="mt-6 font-heading text-sm uppercase tracking-[0.12em] text-ink-muted">{c.fits}</h4>
               <div className="mt-2 flex flex-wrap gap-2">
                 {profile.fits.map((f) => (
-                  <span key={f} className="rounded-full bg-sage-soft px-3 py-1 text-sm font-heading text-sage-deep">
+                  <span key={f} className="badge">
                     {f}
                   </span>
                 ))}

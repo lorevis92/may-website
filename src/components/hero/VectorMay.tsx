@@ -116,14 +116,14 @@ export function VectorMay({ gaze }: { gaze: React.MutableRefObject<Gaze> }) {
           <stop offset="1" stopColor="#cfc2b7" />
         </linearGradient>
         <radialGradient id="may-blob" cx="50%" cy="45%" r="55%">
-          <stop offset="0" stopColor="#fbe4e9" />
-          <stop offset="1" stopColor="#fbe4e9" stopOpacity="0" />
+          <stop offset="0" stopColor="#dcefec" />
+          <stop offset="1" stopColor="#dcefec" stopOpacity="0" />
         </radialGradient>
       </defs>
 
       {/* soft backdrop */}
       <circle cx="240" cy="250" r="215" fill="url(#may-blob)" />
-      <ellipse ref={shadow} cx="240" cy="470" rx="118" ry="14" fill="#2a2024" opacity="0.08" />
+      <ellipse ref={shadow} cx="240" cy="470" rx="118" ry="14" fill="#1d1a19" opacity="0.07" />
 
       {/* hair, back layer */}
       <g ref={hairBack}>
@@ -147,7 +147,7 @@ export function VectorMay({ gaze }: { gaze: React.MutableRefObject<Gaze> }) {
           strokeWidth="2"
         />
         {/* collar */}
-        <path d="M212 342c10 20 46 20 56 0l-6 30c-10 10-34 10-44 0z" fill="#5c9a86" />
+        <path d="M212 342c10 20 46 20 56 0l-6 30c-10 10-34 10-44 0z" fill="#0d7f7b" />
         <path d="M240 356l-6 30h12z" fill="#fffaf5" />
         {/* arms */}
         <path d="M178 362c-26 20-40 50-42 86 0 10 8 16 18 16h40c-8-34-12-70-16-102z" fill="url(#may-blouse)" stroke="#e7d9cf" strokeWidth="2" />
@@ -227,7 +227,7 @@ export function VectorMay({ gaze }: { gaze: React.MutableRefObject<Gaze> }) {
       <g>
         <path d="M160 368c0-6 4-10 10-10h140c6 0 10 4 10 10l-4 86H164z" fill="url(#may-lid)" stroke="#b9ab9f" strokeWidth="2" />
         <path d="M170 448l-2 10c0 4 2 6 6 6h132c4 0 6-2 6-6l-2-10z" fill="#bfb3a9" />
-        <path d="M240 404c-6-9-18-4-16 5 1 6 8 11 16 17 8-6 15-11 16-17 2-9-10-14-16-5z" fill="#e0637c" opacity="0.9" />
+        <path d="M240 404c-6-9-18-4-16 5 1 6 8 11 16 17 8-6 15-11 16-17 2-9-10-14-16-5z" fill="#2fb3ac" opacity="0.9" />
       </g>
       {/* desk edge */}
       <path d="M40 464c0-6 4-10 10-10h380c6 0 10 4 10 10v56H40z" fill="#eacfb6" />

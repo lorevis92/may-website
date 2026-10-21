@@ -24,7 +24,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
       <div className="grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-start">
         <div>
           <Eyebrow>{a.eyebrow}</Eyebrow>
-          <h1 className="text-4xl sm:text-5xl font-medium leading-tight">{a.title}</h1>
+          <h1 className="text-[2.5rem] sm:text-[3.25rem] font-medium">{a.title}</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-ink-soft">
             <p>{a.p1.replace("{city}", site.contact.city[locale])}</p>
             <p>{a.p2}</p>
@@ -35,8 +35,8 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
           <ol className="mt-5 grid gap-4 sm:grid-cols-2">
             {a.how.map((h, i) => (
               <li key={h.t} className="card p-5">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-rose text-white font-heading text-sm">{i + 1}</span>
-                <p className="mt-3 font-heading text-lg">{h.t}</p>
+                <span className="font-heading text-sm font-semibold tabular-nums text-jasmine">{String(i + 1).padStart(2, "0")}</span>
+                <p className="mt-3 font-heading text-lg font-medium">{h.t}</p>
                 <p className="mt-1 text-[15px] text-ink-soft">{h.b}</p>
               </li>
             ))}
@@ -55,31 +55,34 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24">
-          <div className="card tape p-5">
+          <div className="card p-3">
             <Portrait className="w-full" />
-            <p className="mt-3 text-center font-hand text-xl">{site.name[locale]} · {site.company}</p>
+            <p className="px-2 pb-1 pt-3 text-center font-heading text-sm text-ink-soft">{site.name[locale]} · {site.company}</p>
           </div>
           <div className="card p-6">
-            <h3 className="font-heading text-sm uppercase tracking-[0.12em] text-ink-muted">{a.credTitle}</h3>
+            <h3 className="kicker">{a.credTitle}</h3>
             <ul className="mt-3 space-y-2.5">
               {a.cred.map((c) => (
                 <li key={c} className="flex gap-3 text-[15px]">
-                  <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-sage-deep" />
+                  <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-jasmine" />
                   <span>{c}</span>
                 </li>
               ))}
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              <span className="sticker bg-white">AIA</span>
-              <span className="sticker bg-honey-soft">MDRT</span>
-              <span className="sticker bg-sage-soft">IC License</span>
+              <span className="badge">AIA</span>
+              <span className="badge">MDRT</span>
+              <span className="badge">IC License</span>
             </div>
           </div>
           <div className="note">
-            <p className="mb-2 text-sm font-heading uppercase tracking-[0.12em] text-[#b47f22]">{a.valuesTitle}</p>
+            <p className="kicker mb-3">{a.valuesTitle}</p>
             <ul className="space-y-1.5">
               {a.values.map((v) => (
-                <li key={v}>♡ {v}</li>
+                <li key={v} className="flex gap-2.5">
+                  <span aria-hidden className="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full bg-jasmine-bright" />
+                  {v}
+                </li>
               ))}
             </ul>
           </div>

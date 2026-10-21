@@ -50,7 +50,7 @@ export function MoneyField({
             max={max * 10}
             step={stepv}
             onChange={(e) => onChange(Number(e.target.value))}
-            className={`${money ? "w-32" : "w-20"} rounded-xl border border-line bg-white px-2.5 py-1.5 text-right text-[15px] focus:outline-none focus:border-ink focus:ring-4 focus:ring-rose/15`}
+            className={`${money ? "w-32" : "w-20"} rounded-lg border border-line bg-white px-2.5 py-1.5 text-right text-[15px] tabular-nums focus:outline-none focus:border-jasmine focus:ring-4 focus:ring-jasmine/15`}
           />
           {suffix && <span className="text-ink-muted text-sm">{suffix}</span>}
         </div>
@@ -80,7 +80,7 @@ export function PercentField({ label, value, onChange, min = 0, max = 0.12, step
         <label htmlFor={id} className="text-sm font-heading text-ink-soft">
           {label}
         </label>
-        <span className="font-heading text-ink">{(value * 100).toFixed(1)}%</span>
+        <span className="font-heading tabular-nums text-ink">{(value * 100).toFixed(1)}%</span>
       </div>
       <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="mt-2 w-full" />
     </div>
@@ -101,8 +101,8 @@ export function Segmented<T extends string | number>({ label, options, value, on
             aria-checked={o.value === value}
             onClick={() => onChange(o.value)}
             className={cx(
-              "rounded-full border px-3.5 py-1.5 text-sm font-heading transition",
-              o.value === value ? "bg-ink text-white border-ink" : "bg-white border-line text-ink-soft hover:border-ink hover:text-ink",
+              "rounded-[var(--radius-control)] border px-3.5 py-1.5 text-sm font-heading transition",
+              o.value === value ? "bg-jasmine-mist text-jasmine-deep border-jasmine/40" : "bg-white border-line text-ink-soft hover:border-line-strong hover:text-ink",
             )}
           >
             {o.label}
@@ -114,12 +114,12 @@ export function Segmented<T extends string | number>({ label, options, value, on
 }
 
 /* ---------- Result tiles ---------- */
-export function Stat({ label, value, tone = "ink", big, sub }: { label: string; value: string; tone?: "ink" | "rose" | "sage" | "honey"; big?: boolean; sub?: string }) {
-  const tones = { ink: "text-ink", rose: "text-rose-deep", sage: "text-sage-deep", honey: "text-[#b47f22]" };
+export function Stat({ label, value, tone = "ink", big, sub }: { label: string; value: string; tone?: "ink" | "jasmine" | "sage" | "honey"; big?: boolean; sub?: string }) {
+  const tones = { ink: "text-ink", jasmine: "text-jasmine-deep", sage: "text-sage-deep", honey: "text-honey-deep" };
   return (
-    <div className="rounded-2xl bg-paper-2/70 px-4 py-3">
+    <div className="rounded-xl border border-line bg-paper/60 px-4 py-3">
       <p className="text-xs uppercase tracking-[0.12em] text-ink-muted font-heading">{label}</p>
-      <p className={cx("font-heading font-medium", tones[tone], big ? "text-3xl sm:text-4xl mt-1" : "text-xl mt-0.5")}>{value}</p>
+      <p className={cx("font-heading font-medium tabular-nums", tones[tone], big ? "text-3xl sm:text-4xl mt-1" : "text-xl mt-0.5")}>{value}</p>
       {sub && <p className="text-xs text-ink-muted mt-0.5">{sub}</p>}
     </div>
   );
@@ -127,8 +127,8 @@ export function Stat({ label, value, tone = "ink", big, sub }: { label: string; 
 
 export function ResultCard({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cx("card tape p-6 sm:p-8", className)}>
-      <h3 className="font-hand text-2xl text-rose-deep">{title}</h3>
+    <div className={cx("card p-6 sm:p-8", className)}>
+      <h3 className="kicker">{title}</h3>
       <div className="mt-4">{children}</div>
     </div>
   );
@@ -168,26 +168,26 @@ export function AreaChart({
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto" role="img" aria-label={`${labels.projected} / ${labels.needed}`}>
       <defs>
         <linearGradient id="area-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5c9a86" stopOpacity="0.45" />
-          <stop offset="1" stopColor="#5c9a86" stopOpacity="0.02" />
+          <stop offset="0" stopColor="#2fb3ac" stopOpacity="0.28" />
+          <stop offset="1" stopColor="#2fb3ac" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={area} fill="url(#area-fill)" />
-      <path d={path} fill="none" stroke="#3f7a69" strokeWidth="3" strokeLinejoin="round" />
+      <path d={path} fill="none" stroke="#0d7f7b" strokeWidth="2.5" strokeLinejoin="round" />
       {target !== undefined && (
         <>
-          <line x1={pad.l} x2={w - pad.r} y1={sy(target)} y2={sy(target)} stroke="#e0637c" strokeWidth="2" strokeDasharray="6 6" />
-          <text x={w - pad.r} y={sy(target) - 6} textAnchor="end" fontSize="12" fill="#c84a66" fontFamily="var(--font-display)">
+          <line x1={pad.l} x2={w - pad.r} y1={sy(target)} y2={sy(target)} stroke="#96661b" strokeWidth="1.5" strokeDasharray="5 5" />
+          <text x={w - pad.r} y={sy(target) - 6} textAnchor="end" fontSize="12" fill="#96661b" fontFamily="var(--heading)">
             {labels.needed} {fmtTHB(target, locale, { compact: true })}
           </text>
         </>
       )}
       {ticks.map((tk, i) => (
-        <text key={tk} x={sx(tk)} y={h - 8} textAnchor={i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"} fontSize="12" fill="#8a7e83" fontFamily="var(--font-display)">
+        <text key={tk} x={sx(tk)} y={h - 8} textAnchor={i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"} fontSize="12" fill="#8a827c" fontFamily="var(--heading)">
           {labels.x} {tk}
         </text>
       ))}
-      <text x={pad.l} y={pad.t} fontSize="12" fill="#3f7a69" fontFamily="var(--font-display)">
+      <text x={pad.l} y={pad.t} fontSize="12" fill="#0a5f5c" fontFamily="var(--heading)">
         {labels.projected}
       </text>
     </svg>
@@ -203,10 +203,10 @@ export function Bucket({ label, used, cap, fullLabel, roomLabel }: { label: stri
     <div>
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="font-heading text-ink">{label}</span>
-        <span className={cx("font-heading", room > 0 ? "text-rose-deep" : "text-sage-deep")}>{room > 0 ? `${roomLabel} ${fmtTHB(room, locale)}` : fullLabel}</span>
+        <span className={cx("font-heading tabular-nums", room > 0 ? "text-honey-deep" : "text-jasmine-deep")}>{room > 0 ? `${roomLabel} ${fmtTHB(room, locale)}` : fullLabel}</span>
       </div>
-      <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-paper-3">
-        <div className="h-full rounded-full bg-sage transition-[width] duration-500" style={{ width: `${pct}%` }} />
+      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-paper-2">
+        <div className="h-full rounded-full bg-jasmine transition-[width] duration-500" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-1 text-xs text-ink-muted">
         {fmtTHB(used, locale)} / {fmtTHB(cap, locale)}

@@ -45,19 +45,19 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/guides/
         <Link href={href("/guides", locale)} className="no-print inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink">
           <Icon name="arrow" className="h-4 w-4 rotate-180" /> {t.guides.allGuides}
         </Link>
-        <p className="mt-6 font-hand text-lg text-rose-deep">{t.guides.eyebrow}</p>
-        <h1 className="mt-2 text-3xl sm:text-5xl font-medium leading-tight">{g.title}</h1>
+        <p className="kicker mt-8">{t.guides.eyebrow}</p>
+        <h1 className="mt-4 text-[2rem] sm:text-[3rem] font-medium">{g.title}</h1>
         <p className="mt-4 text-lg text-ink-soft">{g.subtitle}</p>
         <p className="mt-3 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">
           {g.readingMinutes} {t.guides.readingTime} · {t.guides.updated} {new Date(guide.updated).toLocaleDateString(locale === "th" ? "th-TH" : "en-GB", { year: "numeric", month: "short", day: "numeric" })}
         </p>
 
-        <div className="card tape mt-8 p-6">
-          <p className="font-hand text-xl text-rose-deep">{t.guides.keyTakeaways}</p>
+        <div className="card mt-10 p-6 sm:p-7">
+          <p className="kicker">{t.guides.keyTakeaways}</p>
           <ul className="mt-3 space-y-2">
             {g.summary.map((s) => (
               <li key={s} className="flex gap-3">
-                <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-sage-deep" />
+                <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-jasmine" />
                 <span>{s}</span>
               </li>
             ))}
@@ -75,7 +75,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/guides/
         {toolKey && toolName && (
           <div className="no-print mt-12 card p-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-rose-soft text-rose-deep">
+              <span className="icon-tile h-11 w-11">
                 <Icon name={TOOL_META[toolKey].icon} className="h-6 w-6" />
               </span>
               <div>

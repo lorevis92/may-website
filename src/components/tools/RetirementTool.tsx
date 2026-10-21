@@ -47,9 +47,9 @@ export function RetirementTool() {
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Stat label={c.projected} value={fmtTHB(r.projected, locale, { compact: true })} tone="sage" />
-                <Stat label={c.gap} value={r.gap > 0 ? fmtTHB(r.gap, locale, { compact: true }) : "—"} tone={r.gap > 0 ? "rose" : "sage"} />
+                <Stat label={c.gap} value={r.gap > 0 ? fmtTHB(r.gap, locale, { compact: true }) : "—"} tone={r.gap > 0 ? "honey" : "jasmine"} />
               </div>
-              <div className="mt-5 rounded-2xl bg-ink text-white px-5 py-4">
+              <div className="mt-5 rounded-xl bg-jasmine-ink text-white px-5 py-4">
                 {r.gap > 0 ? (
                   <>
                     <p className="text-xs uppercase tracking-[0.12em] text-white/70 font-heading">{c.needMonthly}</p>

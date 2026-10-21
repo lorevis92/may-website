@@ -16,7 +16,7 @@ export default async function ChatPage({ params }: PageProps<"/[locale]/chat">) 
     <Container className="py-10 sm:py-14">
       <div className="mb-8 max-w-2xl">
         <Eyebrow>{t.chat.eyebrow}</Eyebrow>
-        <h1 className="text-4xl sm:text-5xl font-medium leading-tight">{t.chat.title}</h1>
+        <h1 className="text-[2.5rem] sm:text-[3.25rem] font-medium">{t.chat.title}</h1>
         <p className="mt-3 text-lg text-ink-soft">{t.chat.subtitle}</p>
       </div>
       <ChatWithMay />

@@ -43,7 +43,7 @@ export function HeroCharacter() {
       <div
         aria-hidden
         className={cx(
-          "absolute -top-2 left-[6%] z-10 rounded-2xl rounded-bl-sm bg-white px-4 py-2 font-hand text-lg text-ink shadow-soft transition-all duration-500",
+          "absolute -top-2 left-[6%] z-10 rounded-xl rounded-bl-sm border border-line bg-white px-4 py-2 text-[15px] text-ink shadow-soft transition-all duration-500",
           bubble ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2",
         )}
       >
@@ -54,7 +54,7 @@ export function HeroCharacter() {
         {manifest.frames > 0 ? <SpriteMay gaze={gaze} manifest={manifest} /> : <VectorMay gaze={gaze} />}
       </div>
 
-      <p className="mt-2 text-center font-hand text-base text-ink-muted">
+      <p className="mt-3 text-center text-xs font-heading tracking-[0.04em] text-ink-muted">
         <span aria-hidden className="mr-1">↔</span>
         {touch ? t.hero.hintTouch : t.hero.hint}
       </p>

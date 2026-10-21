@@ -38,28 +38,27 @@ export function Header() {
   const isActive = (to: string) => pathname === to || pathname.startsWith(`${to}/`);
 
   return (
-    <header className={cx("sticky top-0 z-50 transition-all", scrolled ? "backdrop-blur-md bg-paper/85 shadow-[0_1px_0_var(--color-line)]" : "bg-transparent")}>
+    <header className={cx("sticky top-0 z-50 transition-all", scrolled ? "backdrop-blur-md bg-paper/85 shadow-[0_1px_0_var(--color-line)]" : "bg-transparent shadow-[0_1px_0_transparent]")}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-16 sm:h-[72px] items-center justify-between gap-4">
           <Link href={href("/", locale)} className="flex items-center gap-2.5 group" aria-label={t.nav.home}>
-            <span className="relative grid h-9 w-9 place-items-center rounded-full bg-rose text-white font-hand text-xl shadow-soft group-hover:rotate-[-6deg] transition-transform">
+            <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-jasmine text-white font-heading text-lg font-semibold transition-colors group-hover:bg-jasmine-deep">
               {locale === "th" ? "ม" : "M"}
-              <span aria-hidden className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-honey border-2 border-paper" />
             </span>
             <span className="leading-tight">
-              <span className="block font-heading text-lg font-medium text-ink">{site.name[locale]}</span>
-              <span className="hidden sm:block text-[11px] uppercase tracking-[0.14em] text-ink-muted">{site.tagline[locale]}</span>
+              <span className="block font-heading text-[17px] font-medium tracking-[-0.01em] text-ink">{site.name[locale]}</span>
+              <span className="hidden sm:block text-[11px] uppercase tracking-[0.12em] text-ink-muted">{site.tagline[locale]}</span>
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Primary">
+          <nav className="hidden lg:flex items-center gap-0.5" aria-label="Primary">
             {links.map((l) => (
               <Link
                 key={l.to}
                 href={l.to}
                 className={cx(
-                  "px-3.5 py-2 rounded-full text-[15px] font-heading transition-colors",
-                  isActive(l.to) ? "bg-ink text-white" : "text-ink-soft hover:text-ink hover:bg-paper-2",
+                  "relative px-3.5 py-2 text-[15px] font-heading transition-colors after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-px after:transition-colors",
+                  isActive(l.to) ? "text-jasmine-deep after:bg-jasmine" : "text-ink-soft hover:text-ink after:bg-transparent",
                 )}
               >
                 {l.label}
@@ -72,14 +71,14 @@ export function Header() {
               href={switchLocalePath(pathname, otherLocale)}
               hrefLang={otherLocale}
               aria-label={t.nav.switchAria}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-sm font-heading text-ink-soft hover:text-ink hover:border-ink transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-control)] border border-line bg-white px-3 py-2 text-sm font-heading text-ink-soft hover:text-ink hover:border-line-strong transition-colors"
             >
               <Icon name="globe" className="h-4 w-4" />
               {t.nav.switchTo}
             </Link>
             <Link
               href={href("/book", locale)}
-              className="hidden sm:inline-flex items-center gap-2 rounded-full bg-ink text-white px-4 py-2 text-sm font-heading shadow-[3px_3px_0_var(--color-rose)] hover:-translate-y-0.5 transition-transform"
+              className="hidden sm:inline-flex items-center gap-2 rounded-[var(--radius-control)] bg-jasmine text-white px-4 py-2 text-sm font-heading font-medium shadow-[0_1px_2px_rgba(10,58,57,0.18)] hover:bg-jasmine-deep transition-colors"
             >
               <Icon name="pen" className="h-4 w-4" />
               {t.nav.book}
@@ -90,7 +89,7 @@ export function Header() {
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? t.nav.close : t.nav.menu}
-              className="lg:hidden grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-ink"
+              className="lg:hidden grid h-10 w-10 place-items-center rounded-[var(--radius-control)] border border-line bg-white text-ink"
             >
               <Icon name={open ? "x" : "menu"} />
             </button>
@@ -110,12 +109,12 @@ export function Header() {
             <Link
               key={l.to}
               href={l.to}
-              className={cx("px-4 py-3 rounded-2xl font-heading text-lg", isActive(l.to) ? "bg-ink text-white" : "text-ink hover:bg-paper-2")}
+              className={cx("px-4 py-3 rounded-[var(--radius-control)] font-heading text-lg", isActive(l.to) ? "bg-jasmine-mist text-jasmine-deep" : "text-ink hover:bg-paper-2")}
             >
               {l.label}
             </Link>
           ))}
-          <Link href={href("/book", locale)} className="mt-2 px-4 py-3 rounded-2xl bg-rose text-white font-heading text-lg text-center">
+          <Link href={href("/book", locale)} className="mt-2 px-4 py-3 rounded-[var(--radius-control)] bg-jasmine text-white font-heading text-lg text-center">
             {t.nav.book}
           </Link>
         </nav>

@@ -9,10 +9,10 @@ import Image from "next/image";
 export function Portrait({ className }: { className?: string }) {
   const hasPhoto = existsSync(path.join(process.cwd(), "public", "may.jpg"));
   if (hasPhoto) {
-    return <Image src="/may.jpg" alt="May" width={800} height={800} className={`${className ?? ""} rounded-2xl object-cover aspect-square`} priority />;
+    return <Image src="/may.jpg" alt="May" width={800} height={800} className={`${className ?? ""} rounded-xl object-cover aspect-square`} priority />;
   }
   return (
-    <svg viewBox="80 60 320 320" className={`${className ?? ""} rounded-2xl`} role="img" aria-label="Illustration of May">
+    <svg viewBox="80 60 320 320" className={`${className ?? ""} rounded-xl`} role="img" aria-label="Illustration of May">
       <defs>
         <linearGradient id="pt-skin" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#f6d2b4" />
@@ -27,14 +27,14 @@ export function Portrait({ className }: { className?: string }) {
           <stop offset="1" stopColor="#f3e7dc" />
         </linearGradient>
       </defs>
-      <rect x="80" y="60" width="320" height="320" fill="#f9dfe4" />
-      <circle cx="240" cy="250" r="150" fill="#fbe9ec" />
+      <rect x="80" y="60" width="320" height="320" fill="#edf6f5" />
+      <circle cx="240" cy="250" r="150" fill="#dcefec" />
       {/* hair back */}
       <path d="M150 215c-6-70 36-120 90-122 56-2 98 48 92 122 10 60 6 120-6 175-14 20-40 26-86 26s-72-6-86-26c-12-55-16-115-4-175z" fill="url(#pt-hair)" />
       {/* neck + body */}
       <path d="M222 286h36v44c0 10-8 16-18 16s-18-6-18-16z" fill="#e8b996" />
       <path d="M118 520c-2-70 18-130 60-160 18-12 36-18 62-18s44 6 62 18c42 30 62 90 60 160z" fill="url(#pt-blouse)" stroke="#e7d9cf" strokeWidth="2" />
-      <path d="M212 342c10 20 46 20 56 0l-6 30c-10 10-34 10-44 0z" fill="#5c9a86" />
+      <path d="M212 342c10 20 46 20 56 0l-6 30c-10 10-34 10-44 0z" fill="#0d7f7b" />
       {/* ears */}
       <ellipse cx="163" cy="226" rx="11" ry="15" fill="#efc19e" />
       <ellipse cx="317" cy="226" rx="11" ry="15" fill="#efc19e" />

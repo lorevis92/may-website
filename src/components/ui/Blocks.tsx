@@ -40,19 +40,19 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
           case "note":
             return (
               <aside key={i} className="note my-6">
-                {(b.title || noteLabel) && <p className="mb-1 text-sm font-heading uppercase tracking-[0.12em] text-[#b47f22]">{b.title ?? noteLabel}</p>}
+                {(b.title || noteLabel) && <p className="kicker mb-2">{b.title ?? noteLabel}</p>}
                 <p>{b.text}</p>
               </aside>
             );
           case "quote":
             return (
-              <blockquote key={i} className="my-6 border-l-4 border-rose pl-5 font-serif text-xl italic text-ink-soft">
+              <blockquote key={i} className="my-8 border-l-2 border-jasmine-bright pl-6 font-heading text-xl sm:text-[1.375rem] leading-snug tracking-[-0.01em] text-jasmine-ink">
                 {b.text}
               </blockquote>
             );
           case "table":
             return (
-              <div key={i} className="my-6 overflow-x-auto rounded-2xl border border-line">
+              <div key={i} className="my-6 overflow-x-auto rounded-xl border border-line bg-white">
                 <table>
                   <thead>
                     <tr>
@@ -75,7 +75,7 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
             );
           case "disclaimer":
             return (
-              <div key={i} className="mt-10 flex gap-3 rounded-2xl bg-paper-2 px-5 py-4 text-sm text-ink-soft">
+              <div key={i} className="mt-10 flex gap-3 rounded-xl border border-line px-5 py-4 text-sm text-ink-soft">
                 <Icon name="lock" className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" />
                 <p>{b.text}</p>
               </div>

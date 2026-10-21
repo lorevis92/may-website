@@ -23,7 +23,7 @@ function renderText(text: string) {
   const parts = text.split(/(\/(?:th|en)\/[a-z0-9\-/]+)/g);
   return parts.map((p, i) =>
     /^\/(th|en)\//.test(p) ? (
-      <Link key={i} href={p} className="underline decoration-rose underline-offset-2 hover:text-rose-deep">
+      <Link key={i} href={p} className="text-jasmine-deep underline decoration-jasmine/40 underline-offset-2 hover:decoration-jasmine">
         {p}
       </Link>
     ) : (
@@ -99,13 +99,13 @@ export function ChatWithMay() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
-      <div className="card ruled flex flex-col overflow-hidden" style={{ minHeight: "min(72vh, 720px)" }}>
+      <div className="card flex flex-col overflow-hidden" style={{ minHeight: "min(72vh, 720px)" }}>
         {/* header */}
         <div className="flex items-center justify-between gap-3 border-b border-line bg-white/70 px-5 py-3 backdrop-blur">
           <div className="flex items-center gap-3">
-            <span className="relative grid h-10 w-10 place-items-center rounded-full bg-rose text-white font-hand text-xl">
+            <span className="relative grid h-10 w-10 place-items-center rounded-full bg-jasmine text-white font-heading text-lg font-semibold">
               {locale === "th" ? "ม" : "M"}
-              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-sage" />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-jasmine-bright" />
             </span>
             <div>
               <p className="font-heading leading-tight">{site.name[locale]}</p>
@@ -118,28 +118,28 @@ export function ChatWithMay() {
               setMessages([{ id: "intro", role: "assistant", content: c.intro }]);
               setShowHandoff(false);
             }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-heading text-ink-soft hover:border-ink hover:text-ink"
+            className="inline-flex items-center gap-1.5 rounded-[var(--radius-control)] border border-line bg-white px-3 py-1.5 text-xs font-heading text-ink-soft hover:border-line-strong hover:text-ink"
           >
             <Icon name="refresh" className="h-3.5 w-3.5" /> {c.newChat}
           </button>
         </div>
 
         {/* messages */}
-        <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6" aria-live="polite">
+        <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto bg-paper/50 px-4 py-5 sm:px-6" aria-live="polite">
           {messages.map((m) => (
             <div key={m.id} className={cx("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div
                 className={cx(
-                  "max-w-[85%] whitespace-pre-wrap rounded-3xl px-4 py-3 text-[15.5px] leading-relaxed shadow-soft",
-                  m.role === "user" ? "rounded-br-md bg-ink text-white" : "rounded-bl-md bg-white text-ink font-hand text-[17px]",
+                  "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-[15.5px] leading-relaxed",
+                  m.role === "user" ? "rounded-br-md bg-jasmine-ink text-white" : "rounded-bl-md border border-line bg-white text-ink",
                 )}
               >
                 {m.content ? renderText(m.content) : null}
                 {m.pending && (
                   <span className="ml-1 inline-flex items-center gap-1 align-middle" aria-label={c.typing}>
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-rose [animation-delay:0ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-rose [animation-delay:120ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-rose [animation-delay:240ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-jasmine-bright [animation-delay:0ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-jasmine-bright [animation-delay:120ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-jasmine-bright [animation-delay:240ms]" />
                   </span>
                 )}
               </div>
@@ -148,7 +148,7 @@ export function ChatWithMay() {
           {messages.length === 1 && (
             <div className="flex flex-wrap gap-2 pt-2">
               {c.suggestions.map((s) => (
-                <button key={s} type="button" onClick={() => void send(s)} className="rounded-full border border-line bg-white px-3.5 py-1.5 text-sm font-heading text-ink-soft hover:border-ink hover:text-ink">
+                <button key={s} type="button" onClick={() => void send(s)} className="rounded-full border border-line bg-white px-3.5 py-1.5 text-sm font-heading text-ink-soft transition-colors hover:border-jasmine/50 hover:text-jasmine-deep">
                   {s}
                 </button>
               ))}
@@ -173,7 +173,7 @@ export function ChatWithMay() {
               maxLength={2000}
               placeholder={c.placeholder}
               disabled={noKey}
-              className="max-h-40 min-h-[48px] flex-1 resize-y rounded-2xl border border-line bg-white px-4 py-3 text-ink focus:outline-none focus:border-ink focus:ring-4 focus:ring-rose/15"
+              className="max-h-40 min-h-[48px] flex-1 resize-y rounded-[var(--radius-control)] border border-line bg-white px-4 py-3 text-ink focus:outline-none focus:border-jasmine focus:ring-4 focus:ring-jasmine/15"
             />
             <Button type="submit" disabled={busy || noKey || !input.trim()} aria-label={c.send} className="h-12 w-12 !p-0">
               <Icon name="arrow" className="h-5 w-5" />
@@ -188,7 +188,7 @@ export function ChatWithMay() {
           <LeadForm source="chat" title={c.handoffTitle} body={c.handoffBody} buttonLabel={c.handoffButton} payload={{ transcript }} />
         ) : (
           <div className="card p-6">
-            <p className="font-hand text-xl text-rose-deep">{c.handoffTitle}</p>
+            <p className="font-heading text-lg font-medium text-ink">{c.handoffTitle}</p>
             <p className="mt-2 text-sm text-ink-soft">{c.handoffBody}</p>
             <Button variant="secondary" size="sm" className="mt-4" onClick={() => setShowHandoff(true)}>
               <Icon name="pen" className="h-4 w-4" /> {c.handoffButton}

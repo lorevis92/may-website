@@ -13,24 +13,24 @@ export function Footer() {
   const cred = site.credentials;
 
   return (
-    <footer className="mt-24 border-t border-line bg-paper-2/60">
+    <footer className="mt-24 border-t border-line bg-paper-2/50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-rose text-white font-hand text-xl">{locale === "th" ? "ม" : "M"}</span>
-              <span className="font-heading text-xl">{site.fullName[locale]}</span>
+              <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-jasmine text-white font-heading text-lg font-semibold">{locale === "th" ? "ม" : "M"}</span>
+              <span className="font-heading text-lg font-medium tracking-[-0.01em]">{site.fullName[locale]}</span>
             </div>
             <p className="mt-4 text-sm text-ink-soft leading-relaxed max-w-md">{t.footer.about}</p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="sticker bg-white">AIA</span>
-              {cred.mdrt && <span className="sticker bg-honey-soft">MDRT{cred.mdrtYears.length ? ` ${cred.mdrtYears.join(" · ")}` : ""}</span>}
-              <span className="sticker bg-sage-soft">IC</span>
+              <span className="badge">AIA</span>
+              {cred.mdrt && <span className="badge">MDRT{cred.mdrtYears.length ? ` ${cred.mdrtYears.join(" · ")}` : ""}</span>}
+              <span className="badge">IC</span>
             </div>
           </div>
 
           <div>
-            <h3 className="font-heading text-sm uppercase tracking-[0.14em] text-ink-muted">{t.footer.quick}</h3>
+            <h3 className="font-heading text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">{t.footer.quick}</h3>
             <ul className="mt-4 space-y-2 text-[15px]">
               {[
                 [href("/tools", locale), t.nav.tools],
@@ -42,7 +42,7 @@ export function Footer() {
                 [href("/privacy", locale), t.footer.legal],
               ].map(([to, label]) => (
                 <li key={to}>
-                  <Link href={to} className="text-ink-soft hover:text-ink">
+                  <Link href={to} className="text-ink-soft transition-colors hover:text-jasmine-deep">
                     {label}
                   </Link>
                 </li>
@@ -51,7 +51,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-heading text-sm uppercase tracking-[0.14em] text-ink-muted">{t.footer.contact}</h3>
+            <h3 className="font-heading text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">{t.footer.contact}</h3>
             <ul className="mt-4 space-y-2.5 text-[15px]">
               {c.lineId && (
                 <li>
@@ -75,7 +75,7 @@ export function Footer() {
                 </li>
               )}
             </ul>
-            <h3 className="mt-6 font-heading text-sm uppercase tracking-[0.14em] text-ink-muted">{t.footer.licences}</h3>
+            <h3 className="mt-6 font-heading text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">{t.footer.licences}</h3>
             <ul className="mt-3 space-y-1 text-xs text-ink-muted">
               {cred.agentLicenseNo && <li>{t.footer.agentLicence} {cred.agentLicenseNo}</li>}
               {cred.icLicenseNo && <li>{t.footer.icLicence} {cred.icLicenseNo}</li>}

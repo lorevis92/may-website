@@ -39,16 +39,16 @@ export default async function DiaryEntryPage({ params }: PageProps<"/[locale]/di
         <Link href={href("/diary", locale)} className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink">
           <Icon name="arrow" className="h-4 w-4 rotate-180" /> {t.diary.allEntries}
         </Link>
-        <article className="card ruled mt-6 p-6 sm:p-10 tape">
-          <p className="font-hand text-lg text-rose-deep">{d.dateline[locale]}</p>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-medium leading-tight">{d[locale].title}</h1>
+        <article className="card mt-6 p-6 sm:p-12">
+          <p className="kicker">{d.dateline[locale]}</p>
+          <h1 className="mt-4 text-[2rem] sm:text-[2.75rem] font-medium text-jasmine-ink">{d[locale].title}</h1>
           <p className="mt-2 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">
             <time dateTime={d.date}>{new Date(d.date).toLocaleDateString(locale === "th" ? "th-TH" : "en-GB", { year: "numeric", month: "long", day: "numeric" })}</time>
           </p>
           <div className="mt-8">
             <Blocks blocks={d[locale].blocks} noteLabel={noteLabel} />
           </div>
-          <p className="mt-10 font-hand text-2xl text-ink">— {site.name[locale]}</p>
+          <p className="mt-12 border-t border-line pt-6 font-heading text-lg font-medium text-jasmine-deep">— {site.name[locale]}</p>
         </article>
 
         <div className="mt-10 card p-6 sm:p-8 text-center">

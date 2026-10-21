@@ -5,7 +5,7 @@ import { site } from "@/lib/site.config";
 import { LeadForm } from "./LeadForm";
 
 const select =
-  "w-full rounded-2xl border border-line bg-white px-4 py-3 text-ink focus:outline-none focus:border-ink focus:ring-4 focus:ring-rose/15 transition";
+  "w-full rounded-[var(--radius-control)] border border-line bg-white px-4 py-3 text-ink focus:outline-none focus:border-jasmine focus:ring-4 focus:ring-jasmine/15 transition";
 
 export function BookForm() {
   const { locale, t } = useI18n();

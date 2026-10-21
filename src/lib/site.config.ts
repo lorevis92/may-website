@@ -15,7 +15,7 @@ export const site = {
   /** TODO: May's full name as printed on her licence (optional, shown in footer). */
   fullName: { th: "เมย์", en: "May" },
   company: "AIA Thailand",
-  /** Credentials are rendered as little "stickers" across the site. */
+  /** Credentials are rendered as small badges across the site. */
   credentials: {
     mdrt: true,
     /** TODO: add the qualifying years, e.g. [2024, 2025, 2026]. Leave empty to show "MDRT member" only. */

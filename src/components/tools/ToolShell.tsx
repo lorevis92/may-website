@@ -19,11 +19,11 @@ export function ToolShell({ slug, name, tagline, intro, minutes, children }: { s
         <Icon name="arrow" className="h-4 w-4 rotate-180" /> {t.tools.index.title}
       </Link>
       <div className="mt-5 flex items-start gap-4">
-        <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${toneBg[meta.tone]}`}>
+        <span className={`h-14 w-14 shrink-0 ${toneBg[meta.tone]}`}>
           <Icon name={meta.icon} className="h-7 w-7" />
         </span>
         <div>
-          <h1 className="text-3xl sm:text-4xl font-medium">{name}</h1>
+          <h1 className="text-[2rem] sm:text-[2.75rem] font-medium">{name}</h1>
           <p className="mt-1 text-ink-soft text-lg">{tagline}</p>
           <p className="mt-2 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">
             <Icon name="clock" className="mr-1 inline h-3.5 w-3.5" />

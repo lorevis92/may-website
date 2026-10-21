@@ -40,7 +40,7 @@ export function TaxTool() {
               <MoneyField label={c.children} value={s.children} onChange={u("children")} max={6} step={1} money={false} stack />
             </div>
             <MoneyField label={c.parents} value={s.parentsSupported} onChange={u("parentsSupported")} max={4} step={1} money={false} />
-            <details className="rounded-2xl border border-line p-4">
+            <details className="rounded-xl border border-line p-4">
               <summary className="cursor-pointer font-heading text-ink-soft">{locale === "th" ? "ค่าลดหย่อนอื่นที่มีอยู่แล้ว" : "Other deductions you already have"}</summary>
               <div className="mt-4 space-y-5">
                 <MoneyField label={c.pvd} value={s.pvd} onChange={u("pvd")} max={500000} step={5000} />
@@ -68,7 +68,7 @@ export function TaxTool() {
                   <Bucket key={b.key} label={bucketLabel[b.key]} used={b.used} cap={b.cap} fullLabel={c.full} roomLabel={c.room} />
                 ))}
               </div>
-              <div className="mt-6 rounded-2xl bg-ink text-white px-5 py-4">
+              <div className="mt-6 rounded-xl bg-jasmine-ink text-white px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.12em] text-white/70 font-heading">{c.savingIfFilled}</p>
                 <p className="mt-1 font-heading text-3xl font-medium">
                   {fmtTHB(r.saving, locale)} <span className="text-base font-normal text-white/70">{c.saving.toLowerCase()}</span>

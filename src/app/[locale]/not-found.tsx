@@ -9,7 +9,7 @@ export default function NotFound() {
   const { locale, t } = useI18n();
   return (
     <Container className="py-24 text-center">
-      <p className="font-hand text-6xl text-rose">404</p>
+      <p className="font-heading text-7xl font-medium tracking-[-0.04em] text-jasmine-bright">404</p>
       <h1 className="mt-4 text-3xl font-medium">{t.notFound.title}</h1>
       <p className="mt-2 text-ink-soft">{t.notFound.body}</p>
       <ButtonLink href={href("/", locale)} className="mt-8">

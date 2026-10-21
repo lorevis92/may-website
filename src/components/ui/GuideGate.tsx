@@ -50,7 +50,7 @@ export function GuideGate({ slug, title, preview, children }: { slug: string; ti
       <>
         {preview}
         {justUnlocked && (
-          <p className="my-6 flex items-center gap-2 rounded-2xl bg-sage-soft px-4 py-3 text-sage-deep">
+          <p className="my-6 flex items-center gap-2 rounded-xl bg-jasmine-mist px-4 py-3 text-jasmine-deep">
             <Icon name="check" className="h-5 w-5" /> {t.guides.unlocked}
           </p>
         )}
