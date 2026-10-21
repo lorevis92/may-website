@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { getMessages, isLocale, locales } from "@/i18n";
 import { href } from "@/i18n/config";
 import { getGuide, listGuides } from "@/lib/content-store";
 import { Blocks } from "@/components/ui/Blocks";
-import { GuideGate } from "@/components/ui/GuideGate";
+import { PrintButton } from "@/components/ui/PrintButton";
 import { Container } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
@@ -32,10 +31,6 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/guides/
   const guide = await getGuide(slug);
   if (!guide) notFound();
   const g = guide[locale];
-  // The first ~3 blocks (usually an h2 + two paragraphs) are the free preview.
-  const splitAt = Math.min(4, g.blocks.length);
-  const previewBlocks = g.blocks.slice(0, splitAt);
-  const restBlocks = g.blocks.slice(splitAt);
   const noteLabel = locale === "th" ? "โน้ตจากเมย์" : "A note from May";
   const toolKey = guide.relatedTool;
   const toolName = toolKey ? t.tools[toolMessageKey[toolKey]].name : null;
@@ -66,11 +61,10 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/guides/
         </div>
 
         <article className="mt-10">
-          <Suspense fallback={<Blocks blocks={g.blocks} noteLabel={noteLabel} />}>
-            <GuideGate slug={guide.slug} title={g.title} preview={<Blocks blocks={previewBlocks} noteLabel={noteLabel} />}>
-              <Blocks blocks={restBlocks} noteLabel={noteLabel} />
-            </GuideGate>
-          </Suspense>
+          <Blocks blocks={g.blocks} noteLabel={noteLabel} />
+          <div className="no-print mt-10 flex flex-wrap gap-3">
+            <PrintButton />
+          </div>
         </article>
 
         {toolKey && toolName && (

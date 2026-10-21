@@ -415,11 +415,7 @@ export const en = {
   guides: {
     eyebrow: "Plain-language guides",
     title: "Things I wish everyone knew before buying insurance.",
-    subtitle: "Free, honest, and written the way I'd explain it to a friend. Leave your email and I'll unlock the full guide and send you the PDF.",
-    unlockTitle: "Unlock the full guide",
-    unlockBody: "Free. I'll email you a copy so you can keep it, and I'll never spam you.",
-    unlockButton: "Unlock & send me the guide",
-    unlocked: "Unlocked, enjoy! A copy is on its way to your inbox.",
+    subtitle: "Free, honest, and written the way I'd explain it to a friend.",
     readingTime: "min read",
     keyTakeaways: "Key takeaways",
     relatedTool: "Try the matching tool",

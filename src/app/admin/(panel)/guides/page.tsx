@@ -12,7 +12,7 @@ export default async function AdminGuides() {
   const guides = await listGuideDocs();
   return (
     <>
-      <PageHeader title={`Guides (${guides.length})`} intro="Free guides on the site. Visitors read a preview, then unlock the rest with their email.">
+      <PageHeader title={`Guides (${guides.length})`} intro="Free guides on the site, readable in full by every visitor.">
         <Link href="/admin/guides/new" className={buttonClass("primary", "md")}>
           New guide
         </Link>

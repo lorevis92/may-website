@@ -64,7 +64,7 @@ export function GuideEditor({ doc }: { doc?: GuideDoc }) {
                 <Field label="Key takeaways" hint="One per line, 3–5 short lines. Shown at the top, before the email gate.">
                   <TextArea name={`${key}.summary`} defaultValue={l?.summary.join("\n")} rows={5} />
                 </Field>
-                <Field label="Guide text" hint="The first few blocks are the free preview; the rest unlocks after the email.">
+                <Field label="Guide text">
                   <TextArea name={`${key}.body`} defaultValue={l?.body} rows={26} className="font-mono text-[14px]" />
                 </Field>
               </fieldset>
