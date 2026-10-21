@@ -24,6 +24,11 @@ export function cx(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
+/** Button styling for elements that can't be <Button>/<ButtonLink> (e.g. an <a> with its own click handler). */
+export function buttonClass(variant: Variant = "primary", size: Size = "md", className?: string) {
+  return cx(base, variants[variant], sizes[size], className);
+}
+
 interface ButtonBase {
   variant?: Variant;
   size?: Size;

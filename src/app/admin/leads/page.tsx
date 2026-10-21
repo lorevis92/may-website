@@ -57,6 +57,8 @@ export default async function AdminLeads({ searchParams }: { searchParams: Promi
               <details key={l.id} className="card p-5">
                 <summary className="flex cursor-pointer flex-wrap items-center gap-x-4 gap-y-1">
                   <span className="rounded-full bg-jasmine-mist px-2.5 py-0.5 text-xs font-heading text-jasmine-deep">{l.source}</span>
+                  {l.ref && <span className="font-mono text-sm tracking-wider text-ink">{l.ref}</span>}
+                  {l.channel === "line" && <span className="rounded-full bg-[#06C755]/10 px-2.5 py-0.5 text-xs font-heading text-[#05a346]">via LINE</span>}
                   <span className="text-xs uppercase text-ink-muted">{l.locale}</span>
                   <span className="font-heading">{l.name ?? "—"}</span>
                   <span className="text-sm text-ink-soft">{[l.email, l.line, l.phone].filter(Boolean).join(" · ") || "no contact"}</span>

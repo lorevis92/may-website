@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { saveLead, type LeadInput, type LeadSource } from "@/lib/leads";
+import { LEAD_REF_RE } from "@/lib/line";
 import { notifyNewLead, sendGuideEmail } from "@/lib/notify";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { site } from "@/lib/site.config";
@@ -36,8 +37,10 @@ export async function POST(req: Request) {
   const email = clean(body.email, 200)?.toLowerCase();
   const phone = clean(body.phone, 40);
   const line = clean(body.line, 80);
+  // "Talk to May on LINE": the visitor reaches her through LINE itself, so no contact field is required.
+  const channel = body.channel === "line" ? "line" : "form";
   if (email && !EMAIL_RE.test(email)) return NextResponse.json({ ok: false, error: "bad_email" }, { status: 400 });
-  if (!email && !phone && !line) return NextResponse.json({ ok: false, error: "no_contact" }, { status: 400 });
+  if (channel === "form" && !email && !phone && !line) return NextResponse.json({ ok: false, error: "no_contact" }, { status: 400 });
   if (body.consent !== true) return NextResponse.json({ ok: false, error: "no_consent" }, { status: 400 });
 
   let payload: Record<string, unknown> | undefined;
@@ -59,6 +62,9 @@ export async function POST(req: Request) {
     consent: true,
     page: clean(body.page, 300),
     userAgent: req.headers.get("user-agent")?.slice(0, 200) ?? undefined,
+    // The client picks the code up front so it can already be in the LINE message it opens.
+    ref: typeof body.ref === "string" && LEAD_REF_RE.test(body.ref) ? body.ref : undefined,
+    channel,
   };
 
   try {
@@ -73,7 +79,7 @@ export async function POST(req: Request) {
         guideUrl: `${site.url}/${locale}/guides/${payload.guideSlug}?unlocked=1`,
       });
     }
-    return NextResponse.json({ ok: true, id: lead.id });
+    return NextResponse.json({ ok: true, id: lead.id, ref: lead.ref });
   } catch (err) {
     console.error("[leads] save failed", err);
     return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });

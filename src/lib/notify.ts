@@ -43,7 +43,7 @@ export async function notifyNewLead(lead: Lead): Promise<void> {
   try {
     const { Resend } = await import("resend");
     const resend = new Resend(key);
-    const subject = `New lead · ${labels[lead.source]}${lead.name ? ` · ${lead.name}` : ""}`;
+    const subject = `New lead · ${labels[lead.source]}${lead.channel === "line" ? " · via LINE" : ""} · ${lead.ref}${lead.name ? ` · ${lead.name}` : ""}`;
     const contact = [
       lead.name && `<b>Name:</b> ${escapeHtml(lead.name)}`,
       lead.email && `<b>Email:</b> ${escapeHtml(lead.email)}`,
@@ -60,7 +60,7 @@ export async function notifyNewLead(lead: Lead): Promise<void> {
       subject,
       html: `<div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;color:#2a2024">
         <p style="margin:0 0 8px"><b>${labels[lead.source]}</b> · ${lead.locale.toUpperCase()} · ${new Date(lead.createdAt).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" })} (Bangkok)</p>
-        <p style="margin:0 0 8px">${contact || "<i>No contact details left</i>"}</p>
+        <p style="margin:0 0 8px">${contact || (lead.channel === "line" ? `<i>Opened LINE with reference <b>${escapeHtml(lead.ref)}</b>. Watch for their message.</i>` : "<i>No contact details left</i>")}</p>
         ${renderPayload(lead.payload)}
         <p style="margin-top:16px;font-size:12px;color:#8a7e83">Consent: ${lead.consent ? "yes" : "no"} · Page: ${escapeHtml(lead.page ?? "-")}</p>
       </div>`,

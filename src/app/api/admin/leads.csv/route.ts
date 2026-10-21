@@ -16,8 +16,8 @@ export async function GET(req: Request) {
   if (!ok) return new Response("Unauthorized", { status: 401 });
 
   const leads = await listLeads(5000);
-  const header = ["createdAt", "source", "locale", "name", "email", "phone", "line", "message", "consent", "page", "payload"];
-  const rows = leads.map((l) => [l.createdAt, l.source, l.locale, l.name, l.email, l.phone, l.line, l.message, l.consent, l.page, l.payload].map(csvCell).join(","));
+  const header = ["createdAt", "ref", "source", "channel", "locale", "name", "email", "phone", "line", "message", "consent", "page", "payload"];
+  const rows = leads.map((l) => [l.createdAt, l.ref, l.source, l.channel, l.locale, l.name, l.email, l.phone, l.line, l.message, l.consent, l.page, l.payload].map(csvCell).join(","));
   const csv = "﻿" + [header.join(","), ...rows].join("\r\n");
   return new Response(csv, {
     headers: {

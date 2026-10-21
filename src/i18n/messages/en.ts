@@ -507,6 +507,26 @@ export const en = {
     sendResult: "Send my result to May",
     includeResult: "Your inputs and result will be included so May can respond properly.",
   },
+  /** "Talk to May on LINE": button copy, plus the short message prefilled in LINE (written as the visitor). */
+  line: {
+    button: "Talk to May on LINE",
+    hint: "Opens LINE with a short message ready to send. Tapping saves what you did here under a short reference code so May can see the details, as described in the ",
+    or: "or leave your details",
+    doneCta: "Prefer LINE? Message May directly",
+    greeting: "Hi May!",
+    ask: "Could we talk about it when you have a moment?",
+    askBook: "Would that work for you?",
+    ref: "Ref: {ref}",
+    context: {
+      chat: "I've been chatting with your assistant on your website. {summary}",
+      chatFallback: "I asked about: \"{question}\"",
+      chatFallbackMore: "I asked about: \"{question}\" and a few follow-ups.",
+      tool: "I just used the \"{tool}\" tool on your website.",
+      guide: "I just read your guide \"{guide}\".",
+      book: "I'd like to book a chat about: {topic}. Best time for me: {when}.",
+      other: "I found you through your website.",
+    },
+  },
   footer: {
     about: "May is an independent-minded advisor appointed by AIA Thailand. This website is her personal site; product terms are governed by the policy documents issued by AIA.",
     licences: "Licences",

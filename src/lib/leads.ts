@@ -2,6 +2,7 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { newLeadRef } from "@/lib/line";
 
 /**
  * Lead storage with two backends:
@@ -37,10 +38,15 @@ export interface LeadInput {
   /** Page the lead came from, for context. */
   page?: string;
   userAgent?: string;
+  /** Short code quoted in the LINE message (see lib/line.ts); generated here when missing. */
+  ref?: string;
+  /** "line" when the visitor tapped "Talk to May on LINE" instead of sending the form. */
+  channel?: "form" | "line";
 }
 
 export interface Lead extends LeadInput {
   id: string;
+  ref: string;
   createdAt: string;
 }
 
@@ -70,18 +76,21 @@ async function pgClient() {
         user_agent TEXT
       );
       CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC);
+      ALTER TABLE leads ADD COLUMN IF NOT EXISTS ref TEXT;
+      ALTER TABLE leads ADD COLUMN IF NOT EXISTS channel TEXT;
+      CREATE INDEX IF NOT EXISTS leads_ref_idx ON leads (ref);
     `);
   }
   return g.__mayPool;
 }
 
 export async function saveLead(input: LeadInput): Promise<Lead> {
-  const lead: Lead = { id: randomUUID(), createdAt: new Date().toISOString(), ...input };
+  const lead: Lead = { id: randomUUID(), createdAt: new Date().toISOString(), ...input, ref: input.ref ?? newLeadRef() };
   const pool = await pgClient();
   if (pool) {
     await pool.query(
-      `INSERT INTO leads (id, created_at, source, locale, name, email, phone, line, message, payload, consent, page, user_agent)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+      `INSERT INTO leads (id, created_at, source, locale, name, email, phone, line, message, payload, consent, page, user_agent, ref, channel)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
       [
         lead.id,
         lead.createdAt,
@@ -96,6 +105,8 @@ export async function saveLead(input: LeadInput): Promise<Lead> {
         lead.consent,
         lead.page ?? null,
         lead.userAgent ?? null,
+        lead.ref,
+        lead.channel ?? null,
       ],
     );
     return lead;
@@ -123,6 +134,8 @@ export async function listLeads(limit = 500): Promise<Lead[]> {
       consent: !!r.consent,
       page: r.page ?? undefined,
       userAgent: r.user_agent ?? undefined,
+      ref: r.ref ?? "",
+      channel: r.channel ?? undefined,
     }));
   }
   try {

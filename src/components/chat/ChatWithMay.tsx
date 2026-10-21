@@ -7,6 +7,7 @@ import { href } from "@/i18n/config";
 import { Button, cx } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { LeadForm } from "@/components/ui/LeadForm";
+import { fill } from "@/lib/line";
 import { site } from "@/lib/site.config";
 
 interface Msg {
@@ -104,10 +105,31 @@ export function ChatWithMay() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const userTurns = messages.filter((m) => m.role === "user").length;
   const showHandoff = handoffOpened || userTurns >= 3;
+  // Short recap for the "Talk to May on LINE" message: fetched once per finished reply while the handoff panel is shown.
+  const [recap, setRecap] = useState<{ at: number; text: string } | null>(null);
+  const lastMsg = messages[messages.length - 1];
+  const recapDue = (showHandoff || noKey) && !busy && userTurns > 0 && lastMsg.role === "assistant" && !lastMsg.pending && recap?.at !== messages.length;
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!recapDue) return;
+    const ctrl = new AbortController();
+    const at = messages.length;
+    fetch("/api/chat/summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locale, messages: messages.filter((m) => m.id !== "intro").map(({ role, content }) => ({ role, content })) }),
+      signal: ctrl.signal,
+    })
+      .then((r) => (r.ok ? (r.json() as Promise<{ summary?: string }>) : null))
+      // An empty recap falls back to the visitor's first question (below) and stops retries for this reply.
+      .then((d) => setRecap({ at, text: d?.summary ?? "" }))
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [recapDue, messages, locale]);
 
 
   async function send(text: string) {
@@ -155,7 +177,17 @@ export function ChatWithMay() {
     void send(input);
   }
 
-  const transcript = messages.filter((m) => m.id !== "intro").map((m) => `${m.role === "user" ? "Visitor" : "May (AI)"}: ${m.content}`).join("\n\n");
+  // Most recent part only: the leads API caps payloads at 20k characters.
+  const transcript = messages
+    .filter((m) => m.id !== "intro")
+    .map((m) => `${m.role === "user" ? "Visitor" : "May (AI)"}: ${m.content}`)
+    .join("\n\n")
+    .slice(-15000);
+  const questions = messages.filter((m) => m.role === "user").map((m) => m.content.replace(/\s+/g, " ").trim());
+  const firstQuestion = questions[0] && questions[0].length > 90 ? `${questions[0].slice(0, 89).trimEnd()}…` : questions[0];
+  const recapText =
+    recap?.text || (firstQuestion ? fill(questions.length > 1 ? t.line.context.chatFallbackMore : t.line.context.chatFallback, { question: firstQuestion }) : "");
+  const lineContext = recapText ? fill(t.line.context.chat, { summary: recapText }) : undefined;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
@@ -177,6 +209,7 @@ export function ChatWithMay() {
             onClick={() => {
               setMessages([{ id: "intro", role: "assistant", content: c.intro }]);
               setShowHandoff(false);
+              setRecap(null);
             }}
             className="inline-flex items-center gap-1.5 rounded-[var(--radius-control)] border border-line bg-white px-3 py-1.5 text-xs font-heading text-ink-soft hover:border-line-strong hover:text-ink"
           >
@@ -245,7 +278,7 @@ export function ChatWithMay() {
 
       <aside className="space-y-5">
         {showHandoff || noKey ? (
-          <LeadForm source="chat" title={c.handoffTitle} body={c.handoffBody} buttonLabel={c.handoffButton} payload={{ transcript }} />
+          <LeadForm source="chat" title={c.handoffTitle} body={c.handoffBody} buttonLabel={c.handoffButton} payload={{ transcript }} lineContext={lineContext} />
         ) : (
           <div className="card p-6">
             <p className="font-heading text-lg font-medium text-ink">{c.handoffTitle}</p>
