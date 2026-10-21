@@ -8,9 +8,9 @@ function inline(text: string) {
 }
 
 /** Renders the content block model used by guides, diary entries and the privacy notice. */
-export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: string }) {
+export function Blocks({ blocks, noteLabel, className = "prose-may text-[17px] leading-relaxed text-ink" }: { blocks: Block[]; noteLabel?: string; className?: string }) {
   return (
-    <div className="prose-may text-[17px] leading-relaxed text-ink">
+    <div className={className}>
       {blocks.map((b, i) => {
         switch (b.type) {
           case "h2":

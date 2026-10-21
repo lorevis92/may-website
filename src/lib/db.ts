@@ -122,3 +122,27 @@ export async function writeJsonFile(name: string, value: unknown): Promise<void>
   await fs.writeFile(tmp, JSON.stringify(value, null, 2), "utf8");
   await fs.rename(tmp, file);
 }
+
+/** One value from the `settings` table (or ./data/settings.json without a database). */
+export async function readSetting(key: string): Promise<string | undefined> {
+  const pool = await db();
+  if (pool) {
+    const { rows } = await pool.query("SELECT value FROM settings WHERE key = $1", [key]);
+    return rows[0]?.value as string | undefined;
+  }
+  return (await readJsonFile<Record<string, string>>("settings.json"))?.[key];
+}
+
+export async function writeSetting(key: string, value: string): Promise<void> {
+  const pool = await db();
+  if (pool) {
+    await pool.query(
+      `INSERT INTO settings (key, value, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
+      [key, value],
+    );
+    return;
+  }
+  const settings = (await readJsonFile<Record<string, string>>("settings.json")) ?? {};
+  await writeJsonFile("settings.json", { ...settings, [key]: value });
+}

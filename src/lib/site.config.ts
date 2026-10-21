@@ -20,10 +20,10 @@ export const site = {
     mdrt: true,
     /** TODO: add the qualifying years, e.g. [2024, 2025, 2026]. Leave empty to show "MDRT member" only. */
     mdrtYears: [] as number[],
-    /** Life insurance agent licence no. — TODO replace. Shown in the footer as required by the OIC. */
-    agentLicenseNo: "XXXXXXXXXX",
-    /** Investment Consultant licence (unit-linked / funds). Set to "" to hide. TODO replace. */
-    icLicenseNo: "XXXXXX",
+    /** Life insurance agent licence no. (OIC). Shown in the footer and on the About page. */
+    agentLicenseNo: "6501000257",
+    /** Investment Consultant licence (SEC, unit-linked / funds). Set to "" to hide. */
+    icLicenseNo: "120405",
     /** Non-life (general insurance) licence if she has one. Set to "" to hide. */
     nonLifeLicenseNo: "",
   },

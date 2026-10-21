@@ -3,6 +3,9 @@ import { getMessages, isLocale } from "@/i18n";
 import { href } from "@/i18n/config";
 import { site } from "@/lib/site.config";
 import { listDiary, listGuides } from "@/lib/content-store";
+import { getAbout } from "@/lib/about-store";
+import { markdownToBlocks } from "@/lib/markdown";
+import { Blocks } from "@/components/ui/Blocks";
 import { Hero } from "@/components/hero/Hero";
 import { Container, Section, SectionTitle } from "@/components/ui/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -18,7 +21,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
-  const [guides, diary] = await Promise.all([listGuides(), listDiary()]);
+  const [guides, diary, about] = await Promise.all([listGuides(), listDiary(), getAbout()]);
   const latest = diary[0];
 
   return (
@@ -111,14 +114,14 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               <p className="px-2 pb-1 pt-3 text-center font-heading text-sm text-ink-soft">{site.name[locale]} · {site.company}</p>
             </div>
             <div>
-              <SectionTitle eyebrow={t.about.eyebrow} title={t.about.title} className="mb-6" />
-              <p className="text-lg leading-relaxed text-ink-soft">{t.about.p1.replace("{city}", site.contact.city[locale])}</p>
-              <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t.about.p2}</p>
+              <SectionTitle eyebrow={about[locale].eyebrow} title={about[locale].title} className="mb-6" />
+              {/* The first two paragraphs of May's bio (edited in /admin/about). */}
+              <Blocks blocks={markdownToBlocks(about[locale].bio).filter((b) => b.type === "p").slice(0, 2)} className="prose-may text-lg leading-relaxed text-ink-soft" />
               <ul className="mt-6 grid gap-2 sm:grid-cols-2">
-                {t.about.values.map((v) => (
-                  <li key={v} className="flex gap-3 text-[15px]">
+                {about.values.map((v, i) => (
+                  <li key={i} className="flex gap-3 text-[15px]">
                     <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-jasmine" />
-                    {v}
+                    {v[locale]}
                   </li>
                 ))}
               </ul>

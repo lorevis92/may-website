@@ -14,7 +14,22 @@ const THAI_FONTS = { "--heading": "var(--font-thai)", "--body": "var(--font-thai
  * (lib/markdown → components/ui/Blocks). Side by side on large screens, "Write" / "Preview" tabs on small ones.
  * The textarea keeps its `name`, so the form still saves the raw Markdown exactly as before.
  */
-export function MarkdownField({ name, label, lang, defaultValue = "" }: { name: string; label: string; lang: "th" | "en"; defaultValue?: string }) {
+export function MarkdownField({
+  name,
+  label,
+  lang,
+  defaultValue = "",
+  previewClassName,
+  height = "h-[70vh]",
+}: {
+  name: string;
+  label: string;
+  lang: "th" | "en";
+  defaultValue?: string;
+  /** Text styling of the page the text appears on, when it isn't the guide/diary default. */
+  previewClassName?: string;
+  height?: string;
+}) {
   const [text, setText] = useState(defaultValue);
   const [tab, setTab] = useState<"write" | "preview">("write");
   const deferred = useDeferredValue(text);
@@ -46,12 +61,12 @@ export function MarkdownField({ name, label, lang, defaultValue = "" }: { name: 
           onChange={(e) => setText(e.target.value)}
           lang={lang}
           spellCheck
-          className={cx(inputCls, "h-[70vh] min-h-[22rem] resize-y font-mono text-[14px] leading-relaxed", tab === "preview" && "hidden lg:block")}
+          className={cx(inputCls, height, "min-h-[22rem] resize-y font-mono text-[14px] leading-relaxed", tab === "preview" && "hidden lg:block")}
         />
-        <div className={cx("flex h-[70vh] min-h-[22rem] flex-col overflow-hidden rounded-[var(--radius-control)] border border-line bg-paper", tab === "write" && "hidden lg:flex")}>
+        <div className={cx("flex min-h-[22rem] flex-col overflow-hidden", height, "rounded-[var(--radius-control)] border border-line bg-paper", tab === "write" && "hidden lg:flex")}>
           <p className="border-b border-line bg-white/70 px-4 py-2 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">Preview</p>
           <div lang={lang} style={lang === "th" ? THAI_FONTS : undefined} className="flex-1 overflow-y-auto px-5 py-4 sm:px-7">
-            {blocks.length ? <Blocks blocks={blocks} noteLabel={noteLabel} /> : <p className="text-sm text-ink-muted">Start writing on the left: the page will appear here as visitors see it.</p>}
+            {blocks.length ? <Blocks blocks={blocks} noteLabel={noteLabel} className={previewClassName} /> : <p className="text-sm text-ink-muted">Start writing on the left: the page will appear here as visitors see it.</p>}
           </div>
         </div>
       </div>

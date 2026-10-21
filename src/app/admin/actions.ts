@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import type { IconName } from "@/components/ui/Icon";
+import { ABOUT_ICONS, saveAbout, type AboutDoc, type AboutLocale } from "@/lib/about-store";
 import { addDocument, deleteDocument, MAX_DOC_CHARS, saveAssistantNotes, setDocumentActive } from "@/lib/assistant-store";
 import { adminConfigured, checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
 import {
@@ -116,6 +118,55 @@ export async function removeDocument(fd: FormData): Promise<void> {
   await requireAdmin();
   await deleteDocument(str(fd, "id", 100));
   revalidatePath("/admin/documents");
+}
+
+// ---- About page ----
+
+export async function saveAboutContent(_: ActionState, fd: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const loc = (l: "th" | "en"): AboutLocale => ({
+    eyebrow: str(fd, `${l}.eyebrow`, 120),
+    title: str(fd, `${l}.title`, 200),
+    subtitle: str(fd, `${l}.subtitle`, 400),
+    bio: String(fd.get(`${l}.bio`) ?? "").slice(0, 20_000),
+    howTitle: str(fd, `${l}.howTitle`, 120),
+    credTitle: str(fd, `${l}.credTitle`, 120),
+    valuesTitle: str(fd, `${l}.valuesTitle`, 120),
+  });
+  const th = loc("th");
+  const en = loc("en");
+  if (!th.title || !en.title) return { ok: false, message: "Please fill in the title in both Thai and English." };
+
+  // Each list arrives as JSON from components/admin/ListEditor: an array of flat { "th": "...", "en.title": "..." } objects.
+  const list = (key: string): Record<string, unknown>[] => {
+    try {
+      const v: unknown = JSON.parse(String(fd.get(key) ?? "[]"));
+      return Array.isArray(v) ? v.filter((o): o is Record<string, unknown> => !!o && typeof o === "object") : [];
+    } catch {
+      return [];
+    }
+  };
+  const s = (o: Record<string, unknown>, k: string, max: number) => (typeof o[k] === "string" ? (o[k] as string).trim().slice(0, max) : "");
+
+  const doc: AboutDoc = {
+    th,
+    en,
+    how: list("how")
+      .map((o) => ({ th: { title: s(o, "th.title", 120), body: s(o, "th.body", 500) }, en: { title: s(o, "en.title", 120), body: s(o, "en.body", 500) } }))
+      .filter((h) => h.th.title || h.en.title)
+      .slice(0, 12),
+    skills: list("skills")
+      .map((o) => ({ icon: ABOUT_ICONS.includes(o.icon as IconName) ? (o.icon as IconName) : "check", th: s(o, "th", 240), en: s(o, "en", 240) }))
+      .filter((x) => x.th || x.en)
+      .slice(0, 20),
+    values: list("values")
+      .map((o) => ({ th: s(o, "th", 240), en: s(o, "en", 240) }))
+      .filter((v) => v.th || v.en)
+      .slice(0, 12),
+  };
+  await saveAbout(doc);
+  refreshSite();
+  return { ok: true, message: "Saved. The About page is updated." };
 }
 
 // ---- Guides ----
