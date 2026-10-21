@@ -10,7 +10,7 @@ export function Portrait({ className }: { className?: string }) {
   const hasPhoto = existsSync(path.join(process.cwd(), "public", "may.jpg"));
   if (hasPhoto) {
     // Square crop anchored near the top so a portrait-orientation photo keeps her face in frame.
-    return <Image src="/may.jpg" alt="May" width={426} height={562} className={`${className ?? ""} rounded-xl object-cover object-[50%_12%] aspect-square`} priority />;
+    return <Image src="/may.jpg" alt="May" width={3102} height={4096} sizes="(min-width: 1024px) 460px, 100vw" quality={90} className={`${className ?? ""} rounded-xl object-cover object-[50%_12%] aspect-square`} priority />;
   }
   return (
     <svg viewBox="80 60 320 320" className={`${className ?? ""} rounded-xl`} role="img" aria-label="Illustration of May">

@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
     },
   },
   // Keep the sprite sheet and other static assets untouched.
-  images: { formats: ["image/webp"] },
+  // 90 is used by the portrait photo so it stays crisp.
+  images: { formats: ["image/webp"], qualities: [75, 90] },
   async headers() {
     return [
       {
