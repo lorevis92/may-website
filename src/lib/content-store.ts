@@ -3,7 +3,7 @@ import { cache } from "react";
 import type { Pool } from "pg";
 import { diary as seedDiary, guides as seedGuides } from "@/content";
 import type { DiaryEntry, Guide } from "@/content/types";
-import { db, readJsonFile, writeJsonFile } from "@/lib/db";
+import { db, readJsonFile, SEED_LOCK, withAdvisoryLock, writeJsonFile } from "@/lib/db";
 import { blocksToMarkdown, markdownToBlocks } from "@/lib/markdown";
 
 /**
@@ -54,28 +54,37 @@ function seedDocs<K extends Kind>(kind: K): DocOf<K>[] {
   })) as DocOf<K>[];
 }
 
-/** Copies the original content into Postgres exactly once (a "seeded:<kind>" flag survives May deleting everything). */
-async function seedOnce(pool: Pool, kind: Kind) {
-  const g = globalThis as unknown as { __maySeeded?: Set<Kind> };
-  g.__maySeeded ??= new Set();
-  if (g.__maySeeded.has(kind)) return;
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const flag = await client.query("INSERT INTO settings (key, value) VALUES ($1, 'yes') ON CONFLICT (key) DO NOTHING", [`seeded:${kind}`]);
-    if (flag.rowCount === 1) {
-      for (const doc of seedDocs(kind)) {
-        await client.query(`INSERT INTO ${TABLE[kind]} (slug, data) VALUES ($1, $2) ON CONFLICT (slug) DO NOTHING`, [doc.slug, JSON.stringify(doc)]);
-      }
-    }
-    await client.query("COMMIT");
-    g.__maySeeded.add(kind);
-  } catch (err) {
-    await client.query("ROLLBACK").catch(() => {});
-    throw err;
-  } finally {
-    client.release();
+/**
+ * Copies the original content into Postgres exactly once (a "seeded:<kind>" flag survives May deleting everything).
+ * Guides and diary use the same advisory lock, so parallel build workers seed one at a time, and each process
+ * keeps the in-flight promise so concurrent requests in it wait for one run instead of starting their own.
+ */
+function seedOnce(pool: Pool, kind: Kind): Promise<void> {
+  const g = globalThis as unknown as { __maySeeding?: Map<Kind, Promise<void>> };
+  g.__maySeeding ??= new Map();
+  let run = g.__maySeeding.get(kind);
+  if (!run) {
+    run = seed(pool, kind).catch((err) => {
+      g.__maySeeding?.delete(kind); // retry on the next call
+      throw err;
+    });
+    g.__maySeeding.set(kind, run);
   }
+  return run;
+}
+
+async function seed(pool: Pool, kind: Kind): Promise<void> {
+  const key = `seeded:${kind}`;
+  // Fast path once it's done: no transaction, no lock.
+  const done = await pool.query("SELECT 1 FROM settings WHERE key = $1", [key]);
+  if (done.rowCount) return;
+  await withAdvisoryLock(pool, SEED_LOCK, async (client) => {
+    const flag = await client.query("INSERT INTO settings (key, value) VALUES ($1, 'yes') ON CONFLICT (key) DO NOTHING", [key]);
+    if (flag.rowCount !== 1) return; // another process finished it while we waited for the lock
+    for (const doc of seedDocs(kind)) {
+      await client.query(`INSERT INTO ${TABLE[kind]} (slug, data) VALUES ($1, $2) ON CONFLICT (slug) DO NOTHING`, [doc.slug, JSON.stringify(doc)]);
+    }
+  });
 }
 
 async function loadAll<K extends Kind>(kind: K): Promise<DocOf<K>[]> {

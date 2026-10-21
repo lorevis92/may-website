@@ -1,7 +1,7 @@
 import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 
 /**
  * Storage for everything May edits (leads, assistant notes, documents, guides, diary):
@@ -57,6 +57,30 @@ const SCHEMA = `
   );
 `;
 
+/** Advisory lock keys (any fixed numbers): one-at-a-time setup across `next build` workers and server instances. */
+export const SCHEMA_LOCK = 7031985;
+export const SEED_LOCK = 7031986;
+
+/**
+ * Runs `fn` in a transaction that first takes the given transaction-level advisory lock, so the same
+ * setup running in several processes at once happens one after the other instead of deadlocking.
+ */
+export async function withAdvisoryLock<T>(pool: Pool, key: number, fn: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock($1)", [key]);
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 /** The shared Postgres pool with the schema in place, or null when running on JSON files. */
 export async function db(): Promise<Pool | null> {
   const url = process.env.DATABASE_URL;
@@ -66,7 +90,9 @@ export async function db(): Promise<Pool | null> {
     const { Pool } = await import("pg");
     g.__mayPool = new Pool({ connectionString: url, ssl: url.includes("localhost") ? undefined : { rejectUnauthorized: false }, max: 3 });
   }
-  g.__maySchema ??= g.__mayPool.query(SCHEMA);
+  // Without the lock, parallel build workers deadlock here: CREATE INDEX takes a share lock on `leads`
+  // that the following ALTER TABLE then has to upgrade, and two processes wait on each other.
+  g.__maySchema ??= withAdvisoryLock(g.__mayPool, SCHEMA_LOCK, (client) => client.query(SCHEMA));
   try {
     await g.__maySchema;
   } catch (err) {
