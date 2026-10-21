@@ -55,10 +55,10 @@ Production build: `npm run build && npm start`.
 
 Any Node host works too (`npm run build && npm start`); keep `data/` writable if you don't set `DATABASE_URL`.
 
-## 5. The hero character (placeholder now → real render later)
+## 5. The hero character (rendered sprite)
 
-Today the hero is an original vector illustration that turns, glances and blinks toward the cursor (tap left/right on phones).
-To replace it with the rendered 3D-style version of May:
+The hero is a rendered sprite strip (`public/hero/`) that turns, glances and blinks toward the cursor (tap left/right on phones). `VectorMay.tsx` is only used when the manifest has `frames: 0`.
+To regenerate it (new photo or clip):
 
 1. **Image** (Higgsfield / any image model): front-facing photo of May + prompt such as
    *"Turn the person in the photo into a friendly 3D-animated-style character. Keep her face, hair, skin tone and smile recognisable. Sitting at a laptop on a plain white desk, front view, looking at the camera. Soft studio light, clean white background, no text."*
@@ -75,6 +75,13 @@ To replace it with the rendered 3D-style version of May:
    `public/hero/sheet.webp`, `public/hero/idle.webp` and `src/components/hero/sprite-manifest.json` (kept under the 16 383 px browser limit).
 4. Rebuild. The hero switches to the sprite automatically (`frames > 0` in the manifest). Same spring, same feel.
    If she looks the wrong way, re-run with `--left-first`.
+5. If the automatic pick goes wrong (e.g. she blinks during a turn, or moves mostly her eyes), open `contact-sheet.png`
+   and choose the frames yourself — 0-based clip frame numbers, viewer-left extreme → eye contact → viewer-right extreme:
+   ```bash
+   python3 scripts/build-hero-sheet.py public/hero/source-clip.mp4 --preview \
+     --frames 60,56,53,50,48,47,46,45,34,87,89,91,92,93,94,96,98,101,105 --idle 34 --blink 38,39
+   ```
+   That is the exact command used for the current sprite. The source clip and contact sheet are git-ignored.
 
 ## 6. Project map
 

@@ -179,6 +179,30 @@ def key_background(im: Image.Image, tol: int = 28) -> Image.Image:
     return Image.fromarray(px, "RGBA")
 
 
+def auto_strip(frames: list[Path], args: argparse.Namespace) -> tuple[list[int], int, list[int]]:
+    """Automatic frame selection; returns (strip in [viewer-left … idle … viewer-right] + blink order, idle index, blink)."""
+    gray = load_gray(frames)
+    strip_idx, centre_pos, left, right, blink = choose_frames(gray, args.max_frames)
+    print(f"kept {len(strip_idx)} frames (turn: {len(strip_idx) - len(blink)}, blink: {len(blink)}); idle at index {centre_pos}")
+
+    # Determine direction: compare horizontal centre of mass of the dark hair mass between the ends.
+    first_im = gray[strip_idx[left]]
+    last_im = gray[strip_idx[right]]
+    def com_x(a: np.ndarray) -> float:
+        dark = (255 - a)
+        xs = np.arange(a.shape[1])
+        return float((dark.sum(axis=0) * xs).sum() / max(1.0, dark.sum()))
+    turns_right_first = com_x(last_im) > com_x(first_im)
+    if args.left_first:
+        turns_right_first = not turns_right_first
+    # Strip order must be [viewer-left … idle … viewer-right].
+    if turns_right_first:
+        turn = strip_idx[: len(strip_idx) - len(blink)][::-1]
+        centre_pos = len(turn) - 1 - centre_pos
+        strip_idx = turn + strip_idx[len(turn):]
+    return strip_idx, centre_pos, blink
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("clip", type=Path)
@@ -188,7 +212,12 @@ def main() -> None:
     ap.add_argument("--keep-bg", action="store_true", help="do not key out the background")
     ap.add_argument("--left-first", action="store_true", help="she turns to the viewer's LEFT first (default: right first)")
     ap.add_argument("--preview", action="store_true", help="also write public/hero/contact-sheet.png")
+    ap.add_argument("--frames", help="manual strip: comma-separated 0-based clip frame numbers, viewer-left extreme → idle → viewer-right extreme (skips auto selection)")
+    ap.add_argument("--idle", type=int, help="with --frames: the eye-contact frame number (must be in --frames)")
+    ap.add_argument("--blink", help="with --frames: comma-separated frame numbers for the idle blink")
     args = ap.parse_args()
+    if args.frames and (args.idle is None or args.idle not in [int(x) for x in args.frames.split(",")]):
+        sys.exit("--frames needs --idle set to one of the listed frames")
 
     if not shutil.which("ffmpeg"):
         sys.exit("ffmpeg not found on PATH")
@@ -198,29 +227,22 @@ def main() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         frames = extract_frames(args.clip, Path(tmp) / "frames", args.crop)
         print(f"extracted {len(frames)} frames")
-        gray = load_gray(frames)
-        strip_idx, centre_pos, left, right, blink = choose_frames(gray, args.max_frames)
-        print(f"kept {len(strip_idx)} frames (turn: {len(strip_idx) - len(blink)}, blink: {len(blink)}); idle at index {centre_pos}")
+        if args.frames:
+            # Manual selection: already in strip order, so no direction detection.
+            turn = [int(x) for x in args.frames.split(",")]
+            blink = [int(x) for x in args.blink.split(",")] if args.blink else []
+            if max(turn + blink) >= len(frames):
+                sys.exit(f"frame numbers must be < {len(frames)}")
+            strip_idx = turn + blink
+            centre_pos = turn.index(args.idle)
+            print(f"manual strip: {len(turn)} turn frames + {len(blink)} blink; idle at index {centre_pos}")
+        else:
+            strip_idx, centre_pos, blink = auto_strip(frames, args)
 
-        # Determine direction: compare horizontal centre of mass of the dark hair mass between the ends.
-        first_im = gray[strip_idx[left]]
-        last_im = gray[strip_idx[right]]
-        def com_x(a: np.ndarray) -> float:
-            dark = (255 - a)
-            xs = np.arange(a.shape[1])
-            return float((dark.sum(axis=0) * xs).sum() / max(1.0, dark.sum()))
-        turns_right_first = com_x(last_im) > com_x(first_im)
-        if args.left_first:
-            turns_right_first = not turns_right_first
-        # Strip order must be [viewer-left … idle … viewer-right].
-        if turns_right_first:
-            turn = strip_idx[: len(strip_idx) - len(blink)][::-1]
-            centre_pos = len(turn) - 1 - centre_pos
-            strip_idx = turn + strip_idx[len(turn):]
-
-        first = Image.open(frames[0])
-        scale = args.width / first.width
-        fw, fh = args.width, int(round(first.height * scale))
+        with Image.open(frames[0]) as first:  # close it, or Windows can't delete the temp dir
+            first_w, first_h = first.size
+        scale = args.width / first_w
+        fw, fh = args.width, int(round(first_h * scale))
         total_w = fw * len(strip_idx)
         if total_w > MAX_SHEET_WIDTH:
             sys.exit(f"strip would be {total_w}px wide (> {MAX_SHEET_WIDTH}). Reduce --width or --max-frames.")
