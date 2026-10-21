@@ -29,12 +29,12 @@ export const site = {
   },
   /** Primary ways to reach May. Empty string hides the channel. TODO replace. */
   contact: {
-    lineId: "@may-advisor",
+    lineId: "@rungmai",
     /** Full LINE add-friend link, e.g. https://line.me/R/ti/p/@xxxx */
-    lineUrl: "https://line.me/R/ti/p/@may-advisor",
-    phone: "+66 8X XXX XXXX",
-    phoneHref: "tel:+668XXXXXXXX",
-    email: "hello@may-advisor.com",
+    lineUrl: "https://line.me/R/ti/p/@rungmai",
+    phone: "+66 80 943 9281",
+    phoneHref: "tel:+66809439281",
+    email: "wealthprime14@gmail.com",
     facebook: "",
     instagram: "",
     /** City shown in "based in" copy. */
