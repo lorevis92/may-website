@@ -6,6 +6,7 @@ import { I18nProvider } from "@/i18n/client";
 import { site } from "@/lib/site.config";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Splash } from "@/components/layout/Splash";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -60,6 +61,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html lang={locale} className="h-full antialiased">
       <body className="min-h-full flex flex-col paper">
         <I18nProvider locale={locale} messages={t}>
+          <Splash />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-white"

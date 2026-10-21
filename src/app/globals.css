@@ -176,9 +176,21 @@ html[lang="th"] .kicker { font-size: 0.9rem; letter-spacing: 0.02em; font-weight
 /* Range inputs used in the planners */
 input[type="range"] { accent-color: var(--color-jasmine); }
 
+/* First-load splash: logo in (0–300ms), overlay out (300–550ms) */
+.splash { animation: splash-out 250ms ease-in 300ms both; }
+.splash-logo { animation: splash-in 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes splash-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes splash-out {
+  to { opacity: 0; visibility: hidden; }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .splash { display: none; }
 }
 
 /* Print: guides become clean PDFs via the browser */

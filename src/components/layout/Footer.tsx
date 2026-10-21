@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/client";
 import { href } from "@/i18n/config";
 import { site } from "@/lib/site.config";
@@ -18,7 +19,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-jasmine text-white font-heading text-lg font-semibold">{locale === "th" ? "ม" : "M"}</span>
+              <Logo className="h-10" />
               <span className="font-heading text-lg font-medium tracking-[-0.01em]">{site.fullName[locale]}</span>
             </div>
             <p className="mt-4 text-sm text-ink-soft leading-relaxed max-w-md">{t.footer.about}</p>

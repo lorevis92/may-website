@@ -6,6 +6,7 @@ import { useState, useSyncExternalStore } from "react";
 import { useI18n } from "@/i18n/client";
 import { href, switchLocalePath } from "@/i18n/config";
 import { Icon } from "@/components/ui/Icon";
+import { Logo } from "@/components/ui/Logo";
 import { cx } from "@/components/ui/Button";
 import { site } from "@/lib/site.config";
 
@@ -42,9 +43,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-16 sm:h-[72px] items-center justify-between gap-4">
           <Link href={href("/", locale)} className="flex items-center gap-2.5 group" aria-label={t.nav.home}>
-            <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-jasmine text-white font-heading text-lg font-semibold transition-colors group-hover:bg-jasmine-deep">
-              {locale === "th" ? "ม" : "M"}
-            </span>
+            <Logo className="h-9 sm:h-11 transition-opacity group-hover:opacity-80" priority />
             <span className="leading-tight">
               <span className="block font-heading text-[17px] font-medium tracking-[-0.01em] text-ink">{site.name[locale]}</span>
               <span className="hidden sm:block text-[11px] uppercase tracking-[0.12em] text-ink-muted">{site.tagline[locale]}</span>
