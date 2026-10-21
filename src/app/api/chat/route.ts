@@ -51,7 +51,6 @@ export async function POST(req: Request) {
         const s = client.messages.stream({
           model: MODEL,
           max_tokens: 700,
-          temperature: 0.7,
           system: [{ type: "text", text: mayPersona(locale), cache_control: { type: "ephemeral" } }],
           messages,
         });
