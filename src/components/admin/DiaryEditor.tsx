@@ -2,6 +2,7 @@ import Link from "next/link";
 import { deleteDiary, saveDiary } from "@/app/admin/actions";
 import { ActionForm, FormFooter } from "@/components/admin/ActionForm";
 import { DeleteButton, Field, Input, MarkdownHelp, TextArea } from "@/components/admin/fields";
+import { MarkdownField } from "@/components/admin/MarkdownField";
 import type { DiaryDoc } from "@/lib/content-store";
 
 const LANGS = [
@@ -42,13 +43,17 @@ export function DiaryEditor({ doc, today }: { doc?: DiaryDoc; today: string }) {
                 <Field label="Excerpt" hint="One or two sentences for the diary list and the home page.">
                   <TextArea name={`${key}.excerpt`} defaultValue={l?.excerpt} rows={3} maxLength={600} />
                 </Field>
-                <Field label="Entry text">
-                  <TextArea name={`${key}.body`} defaultValue={l?.body} rows={24} className="font-mono text-[14px]" />
-                </Field>
               </fieldset>
             );
           })}
         </div>
+
+        <MarkdownHelp />
+        {LANGS.map(({ key, label }) => (
+          <div key={key} className="card p-6">
+            <MarkdownField name={`${key}.body`} label={`Entry text · ${label}`} lang={key} defaultValue={doc?.[key].body} />
+          </div>
+        ))}
 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <FormFooter label={doc ? "Save entry" : "Create entry"} />
@@ -60,7 +65,6 @@ export function DiaryEditor({ doc, today }: { doc?: DiaryDoc; today: string }) {
         </div>
       </ActionForm>
 
-      <MarkdownHelp />
       {doc && <DeleteButton action={deleteDiary} name="slug" value={doc.slug} label="Delete this entry" confirm="Delete this diary entry from the site for good?" />}
     </div>
   );

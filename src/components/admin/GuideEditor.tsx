@@ -2,6 +2,7 @@ import Link from "next/link";
 import { deleteGuide, saveGuide } from "@/app/admin/actions";
 import { ActionForm, FormFooter } from "@/components/admin/ActionForm";
 import { DeleteButton, Field, Input, MarkdownHelp, Select, TextArea } from "@/components/admin/fields";
+import { MarkdownField } from "@/components/admin/MarkdownField";
 import { getMessages } from "@/i18n";
 import type { GuideDoc } from "@/lib/content-store";
 import { TOOL_SLUGS, toolMessageKey } from "@/lib/tools";
@@ -61,16 +62,20 @@ export function GuideEditor({ doc }: { doc?: GuideDoc }) {
                 <Field label="Reading time (minutes)">
                   <Input name={`${key}.readingMinutes`} type="number" min={1} max={60} defaultValue={l?.readingMinutes ?? 5} className="w-32" />
                 </Field>
-                <Field label="Key takeaways" hint="One per line, 3–5 short lines. Shown at the top, before the email gate.">
+                <Field label="Key takeaways" hint="One per line, 3–5 short lines. Shown in a box at the top of the guide.">
                   <TextArea name={`${key}.summary`} defaultValue={l?.summary.join("\n")} rows={5} />
-                </Field>
-                <Field label="Guide text">
-                  <TextArea name={`${key}.body`} defaultValue={l?.body} rows={26} className="font-mono text-[14px]" />
                 </Field>
               </fieldset>
             );
           })}
         </div>
+
+        <MarkdownHelp />
+        {LANGS.map(({ key, label }) => (
+          <div key={key} className="card p-6">
+            <MarkdownField name={`${key}.body`} label={`Guide text · ${label}`} lang={key} defaultValue={doc?.[key].body} />
+          </div>
+        ))}
 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <FormFooter label={doc ? "Save guide" : "Create guide"} />
@@ -82,7 +87,6 @@ export function GuideEditor({ doc }: { doc?: GuideDoc }) {
         </div>
       </ActionForm>
 
-      <MarkdownHelp />
       {doc && <DeleteButton action={deleteGuide} name="slug" value={doc.slug} label="Delete this guide" confirm="Delete this guide from the site for good?" />}
     </div>
   );
