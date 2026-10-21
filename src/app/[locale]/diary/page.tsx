@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMessages, isLocale } from "@/i18n";
 import { href } from "@/i18n/config";
-import { diary } from "@/content";
+import { listDiary } from "@/lib/content-store";
 import { Container, SectionTitle } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
 
@@ -20,6 +20,7 @@ export default async function DiaryPage({ params }: PageProps<"/[locale]/diary">
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
+  const diary = await listDiary();
   return (
     <Container className="py-12 sm:py-16">
       <SectionTitle eyebrow={t.diary.eyebrow} title={t.diary.title} subtitle={t.diary.subtitle} />

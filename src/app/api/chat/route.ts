@@ -1,3 +1,5 @@
+import type { TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
+import { assistantContext } from "@/lib/assistant-store";
 import { mayPersona } from "@/lib/may-persona";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 
@@ -44,6 +46,15 @@ export async function POST(req: Request) {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey });
 
+  // May's notes and documents from /admin go AFTER the fixed persona (and its compliance rules), never instead of it.
+  const extras = await assistantContext().catch((err) => {
+    console.error("[chat] assistant context unavailable", err);
+    return null;
+  });
+  const system: TextBlockParam[] = [{ type: "text", text: mayPersona(locale) }];
+  if (extras) system.push({ type: "text", text: extras });
+  system[system.length - 1].cache_control = { type: "ephemeral" };
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -51,7 +62,7 @@ export async function POST(req: Request) {
         const s = client.messages.stream({
           model: MODEL,
           max_tokens: 700,
-          system: [{ type: "text", text: mayPersona(locale), cache_control: { type: "ephemeral" } }],
+          system,
           messages,
         });
         for await (const event of s) {

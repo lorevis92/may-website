@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMessages, isLocale, locales } from "@/i18n";
 import { href } from "@/i18n/config";
-import { getGuide, guides } from "@/content";
+import { getGuide, listGuides } from "@/lib/content-store";
 import { Blocks } from "@/components/ui/Blocks";
 import { GuideGate } from "@/components/ui/GuideGate";
 import { Container } from "@/components/ui/Section";
@@ -12,14 +12,15 @@ import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { TOOL_META, toolMessageKey } from "@/lib/tools";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const guides = await listGuides();
   return locales.flatMap((locale) => guides.map((g) => ({ locale, slug: g.slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale: raw, slug } = await params;
   const locale = isLocale(raw) ? raw : "th";
-  const guide = getGuide(slug);
+  const guide = await getGuide(slug);
   if (!guide) return {};
   return { title: guide[locale].title, description: guide[locale].subtitle };
 }
@@ -28,7 +29,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/guides/
   const { locale: raw, slug } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
-  const guide = getGuide(slug);
+  const guide = await getGuide(slug);
   if (!guide) notFound();
   const g = guide[locale];
   // The first ~3 blocks (usually an h2 + two paragraphs) are the free preview.

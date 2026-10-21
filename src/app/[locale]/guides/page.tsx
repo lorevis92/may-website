@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getMessages, isLocale } from "@/i18n";
-import { guides } from "@/content";
+import { listGuides } from "@/lib/content-store";
 import { Container, SectionTitle } from "@/components/ui/Section";
 import { GuideCard } from "@/components/ui/GuideCard";
 
@@ -14,6 +14,7 @@ export default async function GuidesPage({ params }: PageProps<"/[locale]/guides
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
+  const guides = await listGuides();
   return (
     <Container className="py-12 sm:py-16">
       <SectionTitle eyebrow={t.guides.eyebrow} title={t.guides.title} subtitle={t.guides.subtitle} />

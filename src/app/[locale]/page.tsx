@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getMessages, isLocale } from "@/i18n";
 import { href } from "@/i18n/config";
 import { site } from "@/lib/site.config";
-import { guides, diary } from "@/content";
+import { listDiary, listGuides } from "@/lib/content-store";
 import { Hero } from "@/components/hero/Hero";
 import { Container, Section, SectionTitle } from "@/components/ui/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -18,6 +18,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
+  const [guides, diary] = await Promise.all([listGuides(), listDiary()]);
   const latest = diary[0];
 
   return (

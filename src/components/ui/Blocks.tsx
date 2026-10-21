@@ -1,5 +1,11 @@
+import { Fragment } from "react";
 import type { Block } from "@/content/types";
 import { Icon } from "./Icon";
+
+/** **bold** inside any block text (the editor's Markdown keeps it as-is). */
+function inline(text: string) {
+  return text.split(/\*\*(.+?)\*\*/g).map((p, i) => (i % 2 ? <strong key={i} className="font-semibold">{p}</strong> : <Fragment key={i}>{p}</Fragment>));
+}
 
 /** Renders the content block model used by guides, diary entries and the privacy notice. */
 export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: string }) {
@@ -10,22 +16,22 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
           case "h2":
             return (
               <h2 key={i} className="font-medium">
-                {b.text}
+                {inline(b.text)}
               </h2>
             );
           case "h3":
             return (
               <h3 key={i} className="font-medium">
-                {b.text}
+                {inline(b.text)}
               </h3>
             );
           case "p":
-            return <p key={i}>{b.text}</p>;
+            return <p key={i}>{inline(b.text)}</p>;
           case "ul":
             return (
               <ul key={i} className="space-y-1.5">
                 {b.items.map((it, k) => (
-                  <li key={k}>{it}</li>
+                  <li key={k}>{inline(it)}</li>
                 ))}
               </ul>
             );
@@ -33,7 +39,7 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
             return (
               <ol key={i} className="space-y-2">
                 {b.items.map((it, k) => (
-                  <li key={k}>{it}</li>
+                  <li key={k}>{inline(it)}</li>
                 ))}
               </ol>
             );
@@ -41,13 +47,13 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
             return (
               <aside key={i} className="note my-6">
                 {(b.title || noteLabel) && <p className="kicker mb-2">{b.title ?? noteLabel}</p>}
-                <p>{b.text}</p>
+                <p>{inline(b.text)}</p>
               </aside>
             );
           case "quote":
             return (
               <blockquote key={i} className="my-8 border-l-2 border-jasmine-bright pl-6 font-heading text-xl sm:text-[1.375rem] leading-snug tracking-[-0.01em] text-jasmine-ink">
-                {b.text}
+                {inline(b.text)}
               </blockquote>
             );
           case "table":
@@ -57,7 +63,7 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
                   <thead>
                     <tr>
                       {b.headers.map((h, k) => (
-                        <th key={k}>{h}</th>
+                        <th key={k}>{inline(h)}</th>
                       ))}
                     </tr>
                   </thead>
@@ -65,7 +71,7 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
                     {b.rows.map((row, r) => (
                       <tr key={r}>
                         {row.map((cell, k) => (
-                          <td key={k}>{cell}</td>
+                          <td key={k}>{inline(cell)}</td>
                         ))}
                       </tr>
                     ))}
@@ -77,7 +83,7 @@ export function Blocks({ blocks, noteLabel }: { blocks: Block[]; noteLabel?: str
             return (
               <div key={i} className="mt-10 flex gap-3 rounded-xl border border-line px-5 py-4 text-sm text-ink-soft">
                 <Icon name="lock" className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" />
-                <p>{b.text}</p>
+                <p>{inline(b.text)}</p>
               </div>
             );
           default:

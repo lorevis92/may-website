@@ -3,21 +3,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMessages, isLocale, locales } from "@/i18n";
 import { href } from "@/i18n/config";
-import { diary, getDiaryEntry } from "@/content";
+import { getDiaryEntry, listDiary } from "@/lib/content-store";
 import { Blocks } from "@/components/ui/Blocks";
 import { Container } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { site } from "@/lib/site.config";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const diary = await listDiary();
   return locales.flatMap((locale) => diary.map((d) => ({ locale, slug: d.slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale: raw, slug } = await params;
   const locale = isLocale(raw) ? raw : "th";
-  const d = getDiaryEntry(slug);
+  const d = await getDiaryEntry(slug);
   if (!d) return {};
   return { title: d[locale].title, description: d[locale].excerpt };
 }
@@ -26,8 +27,9 @@ export default async function DiaryEntryPage({ params }: PageProps<"/[locale]/di
   const { locale: raw, slug } = await params;
   const locale = isLocale(raw) ? raw : "th";
   const t = getMessages(locale);
-  const d = getDiaryEntry(slug);
+  const d = await getDiaryEntry(slug);
   if (!d) notFound();
+  const diary = await listDiary();
   const idx = diary.findIndex((x) => x.slug === slug);
   const newer = diary[idx - 1];
   const older = diary[idx + 1];

@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   // Keep the sprite sheet and other static assets untouched.
   // 90 is used by the portrait photo so it stays crisp.
   images: { formats: ["image/webp"], qualities: [75, 90] },
+  // Admin document uploads (PDF/TXT up to 4 MB, under Vercel's 4.5 MB request limit).
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   async headers() {
     return [
       {

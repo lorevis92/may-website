@@ -2,15 +2,10 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { DATA_DIR, db } from "@/lib/db";
 import { newLeadRef } from "@/lib/line";
 
-/**
- * Lead storage with two backends:
- *  - Postgres when DATABASE_URL is set (Vercel Postgres / Neon / Supabase / any pg).
- *  - A JSON-lines file otherwise (./data/leads.jsonl) — fine for local dev and small self-hosted setups.
- *
- * The table is created on first use, so there is no migration step.
- */
+/** Lead storage: Postgres when DATABASE_URL is set, otherwise a JSON-lines file (./data/leads.jsonl). See lib/db.ts. */
 
 export type LeadSource =
   | "quiz"
@@ -50,43 +45,11 @@ export interface Lead extends LeadInput {
   createdAt: string;
 }
 
-const FILE = path.join(process.cwd(), "data", "leads.jsonl");
-
-async function pgClient() {
-  const url = process.env.DATABASE_URL;
-  if (!url) return null;
-  const { Pool } = await import("pg");
-  const g = globalThis as unknown as { __mayPool?: InstanceType<typeof Pool> };
-  if (!g.__mayPool) {
-    g.__mayPool = new Pool({ connectionString: url, ssl: url.includes("localhost") ? undefined : { rejectUnauthorized: false }, max: 3 });
-    await g.__mayPool.query(`
-      CREATE TABLE IF NOT EXISTS leads (
-        id TEXT PRIMARY KEY,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        source TEXT NOT NULL,
-        locale TEXT NOT NULL,
-        name TEXT,
-        email TEXT,
-        phone TEXT,
-        line TEXT,
-        message TEXT,
-        payload JSONB,
-        consent BOOLEAN NOT NULL DEFAULT false,
-        page TEXT,
-        user_agent TEXT
-      );
-      CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC);
-      ALTER TABLE leads ADD COLUMN IF NOT EXISTS ref TEXT;
-      ALTER TABLE leads ADD COLUMN IF NOT EXISTS channel TEXT;
-      CREATE INDEX IF NOT EXISTS leads_ref_idx ON leads (ref);
-    `);
-  }
-  return g.__mayPool;
-}
+const FILE = path.join(DATA_DIR, "leads.jsonl");
 
 export async function saveLead(input: LeadInput): Promise<Lead> {
   const lead: Lead = { id: randomUUID(), createdAt: new Date().toISOString(), ...input, ref: input.ref ?? newLeadRef() };
-  const pool = await pgClient();
+  const pool = await db();
   if (pool) {
     await pool.query(
       `INSERT INTO leads (id, created_at, source, locale, name, email, phone, line, message, payload, consent, page, user_agent, ref, channel)
@@ -117,7 +80,7 @@ export async function saveLead(input: LeadInput): Promise<Lead> {
 }
 
 export async function listLeads(limit = 500): Promise<Lead[]> {
-  const pool = await pgClient();
+  const pool = await db();
   if (pool) {
     const { rows } = await pool.query(`SELECT * FROM leads ORDER BY created_at DESC LIMIT $1`, [limit]);
     return rows.map((r) => ({

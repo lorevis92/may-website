@@ -1,3 +1,5 @@
+// Original guides and diary entries. The live versions are in the database and edited in /admin;
+// lib/content-store.ts copies these in once on first run, so this is seed data only.
 import type { DiaryEntry, Guide } from "./types";
 import protection101 from "./guides/protection-101";
 import retirementPlan from "./guides/retirement-plan";

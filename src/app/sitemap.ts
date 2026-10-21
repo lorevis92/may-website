@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site.config";
 import { locales } from "@/i18n/config";
-import { guides, diary } from "@/content";
+import { listDiary, listGuides } from "@/lib/content-store";
 import { TOOL_SLUGS } from "@/lib/tools";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [guides, diary] = await Promise.all([listGuides(), listDiary()]);
   const statics = ["", "/about", "/tools", "/guides", "/diary", "/chat", "/book"];
   const paths = [
     ...statics,
