@@ -85,7 +85,7 @@ export async function sendGuideEmail(opts: { to: string; locale: "th" | "en"; gu
       subject: th ? `คู่มือของคุณจากเมย์: ${opts.guideTitle}` : `Your guide from May: ${opts.guideTitle}`,
       html: `<div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.6;color:#2a2024">
         <p>${th ? "สวัสดีค่ะ" : "Hello!"}</p>
-        <p>${th ? "ขอบคุณที่สนใจนะคะ นี่คือลิงก์คู่มือฉบับเต็ม เปิดอ่านได้เลย หรือกด 'พิมพ์ / บันทึกเป็น PDF' ในหน้านั้นเพื่อเก็บไว้ค่ะ" : "Thank you for your interest. Here is your full guide — open it any time, or use 'Print / save as PDF' on the page to keep a copy."}</p>
+        <p>${th ? "ขอบคุณที่สนใจนะคะ นี่คือลิงก์คู่มือฉบับเต็ม เปิดอ่านได้เลย หรือกด 'พิมพ์ / บันทึกเป็น PDF' ในหน้านั้นเพื่อเก็บไว้ค่ะ" : "Thank you for your interest. Here is your full guide. Open it any time, or use 'Print / save as PDF' on the page to keep a copy."}</p>
         <p><a href="${opts.guideUrl}" style="display:inline-block;background:#2a2024;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none">${escapeHtml(opts.guideTitle)}</a></p>
         <p>${th ? "ถ้ามีคำถามหรืออยากคุยเรื่องสถานการณ์ของคุณ ทักเมย์ได้เลยนะคะ" : "If you have questions or would like to talk about your own situation, just reply to this email."}</p>
         <p>— ${th ? "เมย์" : "May"}${site.contact.lineId ? ` · LINE ${site.contact.lineId}` : ""}</p>

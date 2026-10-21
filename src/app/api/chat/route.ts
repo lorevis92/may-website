@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         controller.close();
       } catch (err) {
         console.error("[chat] stream failed", err);
-        controller.enqueue(encoder.encode(locale === "th" ? "\n\n(ขออภัยค่ะ มีปัญหาในการเชื่อมต่อ ลองอีกครั้งนะคะ)" : "\n\n(Sorry — connection hiccup. Please try again.)"));
+        controller.enqueue(encoder.encode(locale === "th" ? "\n\n(ขออภัยค่ะ มีปัญหาในการเชื่อมต่อ ลองอีกครั้งนะคะ)" : "\n\n(Sorry, connection hiccup. Please try again.)"));
         controller.close();
       }
     },
