@@ -18,10 +18,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <Logo className="h-10" />
-              <span className="font-heading text-lg font-medium tracking-[-0.01em]">{site.fullName[locale]}</span>
-            </div>
+            <Logo className="h-11" />
             <p className="mt-4 text-sm text-ink-soft leading-relaxed max-w-md">{t.footer.about}</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="badge">AIA</span>

@@ -44,10 +44,7 @@ export function Header() {
         <div className="flex h-16 sm:h-[72px] items-center justify-between gap-4">
           <Link href={href("/", locale)} className="flex items-center gap-2.5 group" aria-label={t.nav.home}>
             <Logo className="h-9 sm:h-11 transition-opacity group-hover:opacity-80" priority />
-            <span className="leading-tight">
-              <span className="block font-heading text-[17px] font-medium tracking-[-0.01em] text-ink">{site.name[locale]}</span>
-              <span className="hidden sm:block text-[11px] uppercase tracking-[0.12em] text-ink-muted">{site.tagline[locale]}</span>
-            </span>
+            <span className="hidden sm:block text-[11px] leading-tight uppercase tracking-[0.12em] text-ink-muted">{site.tagline[locale]}</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-0.5" aria-label="Primary">

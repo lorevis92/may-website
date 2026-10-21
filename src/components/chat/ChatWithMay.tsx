@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type FormEvent } from "react";
 import { useI18n } from "@/i18n/client";
 import { href } from "@/i18n/config";
 import { Button, cx } from "@/components/ui/Button";
@@ -18,16 +18,76 @@ interface Msg {
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-/** Turns "/en/tools/retirement" style paths in assistant text into links; everything else stays plain text. */
-function renderText(text: string) {
-  const parts = text.split(/(\/(?:th|en)\/[a-z0-9\-/]+)/g);
-  return parts.map((p, i) =>
-    /^\/(th|en)\//.test(p) ? (
-      <Link key={i} href={p} className="text-jasmine-deep underline decoration-jasmine/40 underline-offset-2 hover:decoration-jasmine">
+const LINK = /(\/(?:th|en)\/[a-z0-9\-/]+)/g;
+const BOLD = /\*\*(.+?)\*\*/g;
+const BULLET = /^\s*[-*•]\s+/;
+
+/** Turns "/en/tools/retirement" style paths into links; everything else stays plain text. */
+function renderLinks(text: string, key: string) {
+  return text.split(LINK).map((p, i) =>
+    i % 2 ? (
+      <Link key={`${key}-${i}`} href={p} className="text-jasmine-deep underline decoration-jasmine/40 underline-offset-2 hover:decoration-jasmine">
         {p}
       </Link>
     ) : (
-      <span key={i}>{p}</span>
+      <Fragment key={`${key}-${i}`}>{p}</Fragment>
+    ),
+  );
+}
+
+/** **bold** spans, with links still detected inside them. */
+function renderInline(text: string, key: string) {
+  // Drop a dangling "**" (usually a bold span still streaming in) instead of showing raw asterisks.
+  if (text.replace(BOLD, "").includes("**")) text = text.replace(/\*\*(?!.*\*\*)/, "");
+  return text.split(BOLD).map((p, i) =>
+    i % 2 ? (
+      <strong key={`${key}-${i}`} className="font-semibold text-ink">
+        {renderLinks(p, `${key}-${i}`)}
+      </strong>
+    ) : (
+      <Fragment key={`${key}-${i}`}>{renderLinks(p, `${key}-${i}`)}</Fragment>
+    ),
+  );
+}
+
+/**
+ * The light markdown the model uses: paragraphs (blank line), line breaks, "- " bullet lists and **bold**.
+ * Anything else is shown as plain text.
+ */
+function renderMarkdown(text: string) {
+  const blocks: { type: "p" | "ul"; lines: string[] }[] = [];
+  let cur: (typeof blocks)[number] | undefined;
+  let gap = false;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) {
+      gap = true;
+      continue;
+    }
+    const type = BULLET.test(raw) ? "ul" : "p";
+    // A blank line splits paragraphs but not a list, so loosely spaced bullets stay one list.
+    if (cur?.type !== type || (type === "p" && gap)) blocks.push((cur = { type, lines: [] }));
+    cur.lines.push(type === "ul" ? raw.replace(BULLET, "").trim() : line);
+    gap = false;
+  }
+  return blocks.map((b, i) =>
+    b.type === "ul" ? (
+      <ul key={i} className="list-disc space-y-1 pl-5 marker:text-jasmine">
+        {b.lines.map((l, j) => (
+          <li key={j} className="pl-0.5">
+            {renderInline(l, `${i}-${j}`)}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p key={i}>
+        {b.lines.map((l, j) => (
+          <Fragment key={j}>
+            {j > 0 && <br />}
+            {renderInline(l, `${i}-${j}`)}
+          </Fragment>
+        ))}
+      </p>
     ),
   );
 }
@@ -130,11 +190,11 @@ export function ChatWithMay() {
             <div key={m.id} className={cx("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div
                 className={cx(
-                  "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-[15.5px] leading-relaxed",
-                  m.role === "user" ? "rounded-br-md bg-jasmine-ink text-white" : "rounded-bl-md border border-line bg-white text-ink",
+                  "max-w-[85%] break-words rounded-2xl px-4 py-3 text-[15.5px] leading-relaxed",
+                  m.role === "user" ? "whitespace-pre-wrap rounded-br-md bg-jasmine-ink text-white" : "space-y-2.5 rounded-bl-md border border-line bg-white text-ink",
                 )}
               >
-                {m.content ? renderText(m.content) : null}
+                {m.content ? (m.role === "assistant" ? renderMarkdown(m.content) : m.content) : null}
                 {m.pending && (
                   <span className="ml-1 inline-flex items-center gap-1 align-middle" aria-label={c.typing}>
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-jasmine-bright [animation-delay:0ms]" />
