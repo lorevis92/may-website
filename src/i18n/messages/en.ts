@@ -469,7 +469,6 @@ export const en = {
     channel: "How would you like to talk?",
     channels: ["LINE call", "Phone", "Video call", "In person (Bangkok)"],
     button: "Request my chat",
-    orLine: "Or just message me on LINE",
     promise: "No pressure, no obligation. I promise. If I'm not the right person, I'll say so.",
   },
   about: {
