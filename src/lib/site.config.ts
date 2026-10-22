@@ -3,6 +3,9 @@
  * from one file. Values marked TODO are safe placeholders — replace them before
  * going live.
  */
+/** May's LINE Official Account ID. The add-friend link and the prefilled oaMessage links (lib/line.ts) are built from it. */
+const LINE_ID = "@fpw2010b";
+
 export const site = {
   /** Public site URL (no trailing slash). Used for canonical links, sitemap and OG tags. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.may-advisor.com",
@@ -29,9 +32,9 @@ export const site = {
   },
   /** Primary ways to reach May. Empty string hides the channel. TODO replace. */
   contact: {
-    lineId: "@rungmai",
-    /** Full LINE add-friend link, e.g. https://line.me/R/ti/p/@xxxx */
-    lineUrl: "https://line.me/R/ti/p/@rungmai",
+    lineId: LINE_ID,
+    /** Add-friend link, used where there is no message to prefill. */
+    lineUrl: `https://line.me/R/ti/p/${encodeURIComponent(LINE_ID)}`,
     phone: "+66 80 943 9281",
     phoneHref: "tel:+66809439281",
     email: "wealthprime14@gmail.com",
