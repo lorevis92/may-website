@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { editSite } from "@/app/admin/actions";
 import { cx } from "@/components/ui/Button";
 
 const LINKS = [
   { href: "/admin/leads", label: "Leads" },
   { href: "/admin/assistant", label: "Assistant" },
   { href: "/admin/documents", label: "Documents" },
-  { href: "/admin/about", label: "About" },
-  { href: "/admin/guides", label: "Guides" },
-  { href: "/admin/diary", label: "Diary" },
 ];
 
 export function AdminNav() {
@@ -32,6 +30,12 @@ export function AdminNav() {
           </Link>
         );
       })}
+      {/* About, guides, diary and the site's wording are edited in place on the pages themselves. */}
+      <form action={editSite} className="shrink-0">
+        <button type="submit" className="rounded-[var(--radius-control)] px-3.5 py-2 text-[15px] font-heading text-jasmine-deep transition-colors hover:bg-jasmine-mist">
+          Edit the site ↗
+        </button>
+      </form>
     </nav>
   );
 }

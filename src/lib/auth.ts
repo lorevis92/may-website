@@ -3,6 +3,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { EDIT_HINT_COOKIE } from "@/lib/edit-types";
 
 /**
  * Single-user login for May's admin area.
@@ -51,10 +52,21 @@ export async function createSession(): Promise<void> {
     path: "/",
     maxAge: MAX_AGE,
   });
+  await setEditHint();
+}
+
+/**
+ * Readable by the browser, and only tells the public pages to show May the "Edit page" button.
+ * It grants nothing: every edit is checked against the signed session above.
+ */
+export async function setEditHint(): Promise<void> {
+  (await cookies()).set(EDIT_HINT_COOKIE, "1", { httpOnly: false, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: MAX_AGE });
 }
 
 export async function destroySession(): Promise<void> {
-  (await cookies()).delete(COOKIE);
+  const jar = await cookies();
+  jar.delete(COOKIE);
+  jar.delete(EDIT_HINT_COOKIE);
 }
 
 export async function isAdmin(): Promise<boolean> {

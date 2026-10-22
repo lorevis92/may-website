@@ -1,6 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "@/components/ui/Button";
-import { MARKDOWN_HELP } from "@/lib/markdown";
 
 /** Same field styling as the public forms (components/ui/LeadForm). */
 export const inputCls =
@@ -38,25 +37,6 @@ export function PageHeader({ title, intro, children }: { title: string; intro?: 
       </div>
       {children}
     </div>
-  );
-}
-
-/** Cheat-sheet for the guide/diary body format (lib/markdown.ts). */
-export function MarkdownHelp() {
-  return (
-    <details className="card p-5">
-      <summary className="cursor-pointer font-heading text-ink">How to format the text</summary>
-      <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[auto_1fr]">
-        {MARKDOWN_HELP.map(([syntax, meaning]) => (
-          <div key={syntax} className="contents">
-            <dt>
-              <code className="whitespace-pre rounded-md bg-paper-2 px-2 py-1 font-mono text-[13px] text-ink">{syntax}</code>
-            </dt>
-            <dd className="text-ink-soft sm:pt-1">{meaning}</dd>
-          </div>
-        ))}
-      </dl>
-    </details>
   );
 }
 

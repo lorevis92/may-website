@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getMessages, isLocale } from "@/i18n";
+import { isLocale } from "@/i18n";
 import { href } from "@/i18n/config";
 import { site } from "@/lib/site.config";
 import { listDiary, listGuides } from "@/lib/content-store";
@@ -14,14 +14,17 @@ import { ToolCard } from "@/components/tools/ToolCard";
 import { TOOL_SLUGS } from "@/lib/tools";
 import { GuideCard } from "@/components/ui/GuideCard";
 import { Portrait } from "@/components/ui/Portrait";
+import { Editable, Txt } from "@/components/edit/Editable";
+import { getSiteMessages, getStats } from "@/lib/text-store";
+import { ABOUT_BIO_CLASS } from "@/lib/about-style";
 
 const pillarIcons: Record<string, IconName> = { health: "heart", family: "shield", retirement: "sunrise", savings: "sprout", kids: "book", business: "briefcase" };
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "th";
-  const t = getMessages(locale);
-  const [guides, diary, about] = await Promise.all([listGuides(), listDiary(), getAbout()]);
+  const t = await getSiteMessages(locale);
+  const [guides, diary, about, stats] = await Promise.all([listGuides(), listDiary(), getAbout(), getStats()]);
   const latest = diary[0];
 
   return (
@@ -32,38 +35,49 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <Container>
         <div className="card grid gap-6 p-6 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-line sm:p-0">
           {[
-            { icon: "star" as IconName, title: t.trust.aia, sub: t.trust.aiaSub },
-            { icon: "sparkle" as IconName, title: t.trust.mdrt, sub: t.trust.mdrtSub },
-            { icon: "lock" as IconName, title: t.trust.licensed, sub: t.trust.licensedSub },
+            { icon: "star" as IconName, title: "trust.aia", sub: "trust.aiaSub" },
+            { icon: "sparkle" as IconName, title: "trust.mdrt", sub: "trust.mdrtSub" },
+            { icon: "lock" as IconName, title: "trust.licensed", sub: "trust.licensedSub" },
           ].map((it) => (
             <div key={it.title} className="flex gap-4 sm:p-7">
               <span className="icon-tile h-10 w-10 shrink-0">
                 <Icon name={it.icon} className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-heading text-[17px] font-medium leading-tight">{it.title}</p>
-                <p className="mt-1 text-sm text-ink-soft">{it.sub}</p>
+                <p className="font-heading text-[17px] font-medium leading-tight">
+                  <Txt k={it.title} />
+                </p>
+                <p className="mt-1 text-sm text-ink-soft">
+                  <Txt k={it.sub} />
+                </p>
               </div>
             </div>
           ))}
         </div>
-        {(site.stats.yearsExperience || site.stats.familiesHelped) && (
+        {(stats.yearsExperience || stats.familiesHelped) && (
           <div className="mt-8 flex flex-wrap justify-center gap-x-12 gap-y-3 text-center">
-            {site.stats.yearsExperience && (
+            {stats.yearsExperience && (
               <p>
-                <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep">{site.stats.yearsExperience}+</span>
-                <span className="ml-2 text-ink-soft">{t.trust.years}</span>
+                <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep"><Editable target={{ t: "text" }} field="stats.yearsExperience" kind="number">{stats.yearsExperience}</Editable>+</span>
+                <span className="ml-2 text-ink-soft">
+                  <Txt k="trust.years" />
+                </span>
               </p>
             )}
-            {site.stats.familiesHelped && (
+            {stats.familiesHelped && (
               <p>
-                <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep">{site.stats.familiesHelped}+</span>
-                <span className="ml-2 text-ink-soft">{t.trust.families}</span>
+                <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep"><Editable target={{ t: "text" }} field="stats.familiesHelped" kind="number">{stats.familiesHelped}</Editable>+</span>
+                <span className="ml-2 text-ink-soft">
+                  <Txt k="trust.families" />
+                </span>
               </p>
             )}
             <p>
-              <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep">{site.stats.responseTime[locale]}</span>
-              <span className="ml-2 text-ink-soft">{t.trust.reply}</span>
+              <span className="font-heading text-3xl font-medium tracking-[-0.02em] text-jasmine-deep"><Editable target={{ t: "text" }} field="stats.responseTime">{stats.responseTime[locale]}</Editable>
+              </span>
+              <span className="ml-2 text-ink-soft">
+                <Txt k="trust.reply" />
+              </span>
             </p>
           </div>
         )}
@@ -72,19 +86,25 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       {/* Pillars */}
       <Section>
         <Container>
-          <SectionTitle eyebrow={t.pillars.eyebrow} title={t.pillars.title} subtitle={t.pillars.subtitle} />
+          <SectionTitle eyebrow={<Txt k="pillars.eyebrow" />} title={<Txt k="pillars.title" />} subtitle={<Txt k="pillars.subtitle" kind="textarea" />} />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {t.pillars.items.map((p) => (
+            {t.pillars.items.map((p, i) => (
               <div key={p.key} className="card p-6">
                 <span className="icon-tile h-11 w-11">
                   <Icon name={pillarIcons[p.key]} className="h-5 w-5" />
                 </span>
-                <h3 className="mt-6 text-xl font-medium leading-snug">{p.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{p.body}</p>
+                <h3 className="mt-6 text-xl font-medium leading-snug">
+                  <Txt k={`pillars.items.${i}.title`} />
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+                  <Txt k={`pillars.items.${i}.body`} kind="textarea" />
+                </p>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-sm text-ink-muted">{t.pillars.more}</p>
+          <p className="mt-6 text-sm text-ink-muted">
+            <Txt k="pillars.more" kind="textarea" />
+          </p>
         </Container>
       </Section>
 
@@ -92,7 +112,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <Section className="bg-paper-2/50 border-y border-line">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionTitle eyebrow={t.toolsSection.eyebrow} title={t.toolsSection.title} subtitle={t.toolsSection.subtitle} className="mb-0" />
+            <SectionTitle eyebrow={<Txt k="toolsSection.eyebrow" />} title={<Txt k="toolsSection.title" />} subtitle={<Txt k="toolsSection.subtitle" kind="textarea" />} className="mb-0" />
             <ButtonLink href={href("/tools", locale)} variant="secondary" className="mb-2">
               {t.toolsSection.allTools} <Icon name="arrow" className="h-4 w-4" />
             </ButtonLink>
@@ -114,14 +134,22 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               <p className="px-2 pb-1 pt-3 text-center font-heading text-sm text-ink-soft">{site.name[locale]} · {site.company}</p>
             </div>
             <div>
-              <SectionTitle eyebrow={about[locale].eyebrow} title={about[locale].title} className="mb-6" />
-              {/* The first two paragraphs of May's bio (edited in /admin/about). */}
-              <Blocks blocks={markdownToBlocks(about[locale].bio).filter((b) => b.type === "p").slice(0, 2)} className="prose-may text-lg leading-relaxed text-ink-soft" />
+              <SectionTitle
+                eyebrow={<Editable target={{ t: "about" }} field="eyebrow">{about[locale].eyebrow}</Editable>}
+                title={<Editable target={{ t: "about" }} field="title">{about[locale].title}</Editable>}
+                className="mb-6"
+              />
+              {/* The first two paragraphs of May's bio (the same text as the About page). */}
+              <Editable target={{ t: "about" }} field="bio" kind="markdown" previewClassName={ABOUT_BIO_CLASS} block>
+                <Blocks blocks={markdownToBlocks(about[locale].bio).filter((b) => b.type === "p").slice(0, 2)} className="prose-may text-lg leading-relaxed text-ink-soft" />
+              </Editable>
               <ul className="mt-6 grid gap-2 sm:grid-cols-2">
                 {about.values.map((v, i) => (
                   <li key={i} className="flex gap-3 text-[15px]">
                     <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-jasmine" />
-                    {v[locale]}
+                    <Editable target={{ t: "about" }} field={`values.${i}`}>
+                      {v[locale]}
+                    </Editable>
                   </li>
                 ))}
               </ul>
@@ -142,7 +170,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <Section className="bg-paper-2/50 border-y border-line">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionTitle eyebrow={t.guides.eyebrow} title={t.guides.title} subtitle={t.guides.subtitle} className="mb-0" />
+            <SectionTitle eyebrow={<Txt k="guides.eyebrow" />} title={<Txt k="guides.title" />} subtitle={<Txt k="guides.subtitle" kind="textarea" />} className="mb-0" />
             <ButtonLink href={href("/guides", locale)} variant="secondary" className="mb-2">
               {t.guides.allGuides} <Icon name="arrow" className="h-4 w-4" />
             </ButtonLink>
@@ -171,9 +199,15 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             )}
             <div className="card flex flex-col justify-between border-ink bg-ink p-7 text-white sm:p-9">
               <div>
-                <p className="kicker text-jasmine-bright">{t.chat.eyebrow}</p>
-                <h3 className="mt-4 text-2xl sm:text-[2rem] font-medium">{t.chat.title}</h3>
-                <p className="mt-3 text-white/75 leading-relaxed">{t.chat.subtitle}</p>
+                <p className="kicker text-jasmine-bright">
+                  <Txt k="chat.eyebrow" />
+                </p>
+                <h3 className="mt-4 text-2xl sm:text-[2rem] font-medium">
+                  <Txt k="chat.title" />
+                </h3>
+                <p className="mt-3 text-white/75 leading-relaxed">
+                  <Txt k="chat.subtitle" kind="textarea" />
+                </p>
                 <ul className="mt-5 space-y-2">
                   {t.chat.suggestions.slice(0, 3).map((s) => (
                     <li key={s} className="rounded-xl rounded-bl-sm border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-white/85">

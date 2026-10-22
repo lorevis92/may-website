@@ -6,7 +6,7 @@ import { readSetting, writeSetting } from "@/lib/db";
 import { site } from "@/lib/site.config";
 
 /**
- * Text of the About page (and the About teaser on the home page), edited by May in /admin/about.
+ * Text of the About page (and the About teaser on the home page), edited by May in place on the page.
  * Only words and list items live here; layout and styling stay in the page components.
  * Until May saves something, the original copy from the i18n messages is used.
  */

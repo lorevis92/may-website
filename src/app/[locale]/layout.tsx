@@ -7,6 +7,8 @@ import { site } from "@/lib/site.config";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Splash } from "@/components/layout/Splash";
+import { EditProvider } from "@/components/edit/EditProvider";
+import { getSiteMessages } from "@/lib/text-store";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -42,7 +44,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const { locale: raw } = await params;
   if (!isLocale(raw)) notFound();
   const locale: Locale = raw;
-  const t = getMessages(locale);
+  // With May's own wording (edited in place) over the built-in copy.
+  const t = await getSiteMessages(locale);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -68,11 +71,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           >
             {locale === "th" ? "ข้ามไปเนื้อหา" : "Skip to content"}
           </a>
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <EditProvider>
+            <Header />
+            <main id="main" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </EditProvider>
         </I18nProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </body>

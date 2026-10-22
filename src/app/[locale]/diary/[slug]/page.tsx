@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMessages, isLocale, locales } from "@/i18n";
+import { isLocale, locales } from "@/i18n";
 import { href } from "@/i18n/config";
 import { getDiaryEntry, listDiary } from "@/lib/content-store";
 import { Blocks } from "@/components/ui/Blocks";
@@ -9,6 +9,8 @@ import { Container } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { site } from "@/lib/site.config";
+import { getSiteMessages } from "@/lib/text-store";
+import { Editable, EditableBlocks, Optional, Txt } from "@/components/edit/Editable";
 
 export async function generateStaticParams() {
   const diary = await listDiary();
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function DiaryEntryPage({ params }: PageProps<"/[locale]/diary/[slug]">) {
   const { locale: raw, slug } = await params;
   const locale = isLocale(raw) ? raw : "th";
-  const t = getMessages(locale);
+  const t = await getSiteMessages(locale);
   const d = await getDiaryEntry(slug);
   if (!d) notFound();
   const diary = await listDiary();
@@ -34,6 +36,7 @@ export default async function DiaryEntryPage({ params }: PageProps<"/[locale]/di
   const newer = diary[idx - 1];
   const older = diary[idx + 1];
   const noteLabel = locale === "th" ? "โน้ตจากเมย์" : "A note from May";
+  const D = { t: "diary", slug } as const;
 
   return (
     <Container className="py-10 sm:py-14">
@@ -42,20 +45,40 @@ export default async function DiaryEntryPage({ params }: PageProps<"/[locale]/di
           <Icon name="arrow" className="h-4 w-4 rotate-180" /> {t.diary.allEntries}
         </Link>
         <article className="card mt-6 p-6 sm:p-12">
-          <p className="kicker">{d.dateline[locale]}</p>
-          <h1 className="mt-4 text-[2rem] sm:text-[2.75rem] font-medium text-jasmine-ink">{d[locale].title}</h1>
+          <Optional show={!!d.dateline[locale]}>
+            <p className="kicker">
+              <Editable target={D} field="dateline" placeholder={locale === "th" ? "+ สถานที่ / บรรยากาศ" : "+ Place / mood line"}>
+                {d.dateline[locale]}
+              </Editable>
+            </p>
+          </Optional>
+          <h1 className="mt-4 text-[2rem] sm:text-[2.75rem] font-medium text-jasmine-ink">
+            <Editable target={D} field="title">
+              {d[locale].title}
+            </Editable>
+          </h1>
           <p className="mt-2 text-xs font-heading uppercase tracking-[0.12em] text-ink-muted">
-            <time dateTime={d.date}>{new Date(d.date).toLocaleDateString(locale === "th" ? "th-TH" : "en-GB", { year: "numeric", month: "long", day: "numeric" })}</time>
+            <time dateTime={d.date}>
+              <Editable target={D} field="date" kind="date">
+                {new Date(d.date).toLocaleDateString(locale === "th" ? "th-TH" : "en-GB", { year: "numeric", month: "long", day: "numeric" })}
+              </Editable>
+            </time>
           </p>
           <div className="mt-8">
-            <Blocks blocks={d[locale].blocks} noteLabel={noteLabel} />
+            <EditableBlocks target={D} list="body">
+              <Blocks blocks={d[locale].blocks} noteLabel={noteLabel} />
+            </EditableBlocks>
           </div>
           <p className="mt-12 border-t border-line pt-6 font-heading text-lg font-medium text-jasmine-deep">— {site.name[locale]}</p>
         </article>
 
         <div className="mt-10 card p-6 sm:p-8 text-center">
-          <h2 className="text-2xl font-medium">{t.diary.talkTitle}</h2>
-          <p className="mt-2 text-ink-soft">{t.diary.talkBody}</p>
+          <h2 className="text-2xl font-medium">
+            <Txt k="diary.talkTitle" />
+          </h2>
+          <p className="mt-2 text-ink-soft">
+            <Txt k="diary.talkBody" kind="textarea" />
+          </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             {site.contact.lineUrl && (
               <ButtonLink href={site.contact.lineUrl} variant="line">

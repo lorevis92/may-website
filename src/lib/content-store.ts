@@ -7,7 +7,7 @@ import { db, readJsonFile, SEED_LOCK, withAdvisoryLock, writeJsonFile } from "@/
 import { blocksToMarkdown, markdownToBlocks } from "@/lib/markdown";
 
 /**
- * Guides and diary entries, edited by May in /admin and stored in the database (lib/db.ts).
+ * Guides and diary entries, edited by May in place on the pages and stored in the database (lib/db.ts).
  * Bodies are kept as the small Markdown dialect from lib/markdown.ts and turned into blocks for the pages.
  * On first use the original content from src/content is copied in, once, so nothing is lost.
  */

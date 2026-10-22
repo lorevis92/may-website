@@ -199,3 +199,28 @@ input[type="range"] { accent-color: var(--color-jasmine); }
   body { background: white; font-size: 12.5pt; }
   .card { box-shadow: none; }
 }
+
+/* In-place editing (components/edit): only while May has edit mode on */
+.edit-on .edit-target {
+  cursor: pointer;
+  border-radius: 4px;
+  outline: 1.5px dashed color-mix(in srgb, var(--color-jasmine) 45%, transparent);
+  outline-offset: 3px;
+  transition: background-color 0.15s ease, outline-color 0.15s ease;
+}
+.edit-on .edit-target:hover,
+.edit-on .edit-target:focus-visible {
+  outline: 2px solid var(--color-jasmine);
+  background-color: color-mix(in srgb, var(--color-jasmine-mist) 70%, transparent);
+}
+.edit-on div.edit-target { display: block; }
+.edit-placeholder { color: var(--color-ink-muted); font-style: italic; font-weight: 400; }
+.edit-on [data-edit-blocks] > [data-blocks] > * {
+  cursor: pointer;
+  border-radius: 6px;
+  outline: 1.5px dashed color-mix(in srgb, var(--color-jasmine) 25%, transparent);
+  outline-offset: 6px;
+  transition: outline-color 0.15s ease;
+}
+.edit-on [data-edit-blocks] > [data-blocks] > *:hover { outline: 2px solid var(--color-jasmine); }
+.edit-on span.edit-target:has(> .icon-tile) { display: inline-block; }

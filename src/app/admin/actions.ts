@@ -3,45 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import type { IconName } from "@/components/ui/Icon";
-import { ABOUT_ICONS, saveAbout, type AboutDoc, type AboutLocale } from "@/lib/about-store";
 import { addDocument, deleteDocument, MAX_DOC_CHARS, saveAssistantNotes, setDocumentActive } from "@/lib/assistant-store";
-import { adminConfigured, checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
-import {
-  deleteDiaryDoc,
-  deleteGuideDoc,
-  getDiaryDoc,
-  getGuideDoc,
-  saveDiaryDoc,
-  saveGuideDoc,
-  type DiaryDoc,
-  type DiaryLocaleDoc,
-  type GuideDoc,
-  type GuideLocaleDoc,
-} from "@/lib/content-store";
+import { adminConfigured, checkCredentials, createSession, destroySession, requireAdmin, setEditHint } from "@/lib/auth";
 import { rateLimit } from "@/lib/ratelimit";
-import { TOOL_SLUGS, type ToolSlug } from "@/lib/tools";
 
 /** Result shown under an admin form (see components/admin/ActionForm). */
 export type ActionState = { ok: boolean; message: string } | null;
 
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
-const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const GUIDE_ICONS = ["shield", "sunrise", "receipt", "sprout", "heart", "book"] as const;
 
 const str = (fd: FormData, key: string, max = 500) => String(fd.get(key) ?? "").trim().slice(0, max);
-const lines = (s: string) => s.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-const int = (v: FormDataEntryValue | null, min: number, max: number, fallback: number) => {
-  const n = Math.round(Number(v));
-  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
-};
-const todayInBangkok = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
-/** Guides and diary appear on many public pages (lists, home) and in the sitemap: refresh them all. */
-const refreshSite = () => {
-  revalidatePath("/", "layout");
-  revalidatePath("/sitemap.xml");
-};
 
 // ---- Session ----
 
@@ -62,6 +33,13 @@ export async function login(_: ActionState, fd: FormData): Promise<ActionState> 
 export async function logout(): Promise<void> {
   await destroySession();
   redirect("/admin/login");
+}
+
+/** "Edit the site": shows the edit button on the public pages in this browser and opens the home page in edit mode. */
+export async function editSite(): Promise<void> {
+  await requireAdmin();
+  await setEditHint();
+  redirect("/th?edit=1");
 }
 
 // ---- Assistant ----
@@ -118,146 +96,4 @@ export async function removeDocument(fd: FormData): Promise<void> {
   await requireAdmin();
   await deleteDocument(str(fd, "id", 100));
   revalidatePath("/admin/documents");
-}
-
-// ---- About page ----
-
-export async function saveAboutContent(_: ActionState, fd: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const loc = (l: "th" | "en"): AboutLocale => ({
-    eyebrow: str(fd, `${l}.eyebrow`, 120),
-    title: str(fd, `${l}.title`, 200),
-    subtitle: str(fd, `${l}.subtitle`, 400),
-    bio: String(fd.get(`${l}.bio`) ?? "").slice(0, 20_000),
-    howTitle: str(fd, `${l}.howTitle`, 120),
-    credTitle: str(fd, `${l}.credTitle`, 120),
-    valuesTitle: str(fd, `${l}.valuesTitle`, 120),
-  });
-  const th = loc("th");
-  const en = loc("en");
-  if (!th.title || !en.title) return { ok: false, message: "Please fill in the title in both Thai and English." };
-
-  // Each list arrives as JSON from components/admin/ListEditor: an array of flat { "th": "...", "en.title": "..." } objects.
-  const list = (key: string): Record<string, unknown>[] => {
-    try {
-      const v: unknown = JSON.parse(String(fd.get(key) ?? "[]"));
-      return Array.isArray(v) ? v.filter((o): o is Record<string, unknown> => !!o && typeof o === "object") : [];
-    } catch {
-      return [];
-    }
-  };
-  const s = (o: Record<string, unknown>, k: string, max: number) => (typeof o[k] === "string" ? (o[k] as string).trim().slice(0, max) : "");
-
-  const doc: AboutDoc = {
-    th,
-    en,
-    how: list("how")
-      .map((o) => ({ th: { title: s(o, "th.title", 120), body: s(o, "th.body", 500) }, en: { title: s(o, "en.title", 120), body: s(o, "en.body", 500) } }))
-      .filter((h) => h.th.title || h.en.title)
-      .slice(0, 12),
-    skills: list("skills")
-      .map((o) => ({ icon: ABOUT_ICONS.includes(o.icon as IconName) ? (o.icon as IconName) : "check", th: s(o, "th", 240), en: s(o, "en", 240) }))
-      .filter((x) => x.th || x.en)
-      .slice(0, 20),
-    values: list("values")
-      .map((o) => ({ th: s(o, "th", 240), en: s(o, "en", 240) }))
-      .filter((v) => v.th || v.en)
-      .slice(0, 12),
-  };
-  await saveAbout(doc);
-  refreshSite();
-  return { ok: true, message: "Saved. The About page is updated." };
-}
-
-// ---- Guides ----
-
-export async function saveGuide(_: ActionState, fd: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const isNew = fd.get("isNew") === "1";
-  const slug = str(fd, "slug", 80).toLowerCase();
-  if (!SLUG_RE.test(slug)) return { ok: false, message: "The URL name can only use a–z, 0–9 and dashes, e.g. health-for-parents." };
-  const existing = await getGuideDoc(slug);
-  if (isNew && existing) return { ok: false, message: "There is already a guide with this URL name." };
-  if (!isNew && !existing) return { ok: false, message: "This guide no longer exists." };
-
-  const loc = (l: "th" | "en"): GuideLocaleDoc => ({
-    title: str(fd, `${l}.title`, 200),
-    subtitle: str(fd, `${l}.subtitle`, 400),
-    readingMinutes: int(fd.get(`${l}.readingMinutes`), 1, 60, 5),
-    summary: lines(str(fd, `${l}.summary`, 3000)).slice(0, 8),
-    body: String(fd.get(`${l}.body`) ?? "").slice(0, 80_000),
-  });
-  const th = loc("th");
-  const en = loc("en");
-  if (!th.title || !en.title) return { ok: false, message: "Please fill in the title in both Thai and English." };
-  const icon = String(fd.get("icon"));
-  const tool = String(fd.get("relatedTool") ?? "");
-
-  const doc: GuideDoc = {
-    slug,
-    icon: (GUIDE_ICONS as readonly string[]).includes(icon) ? (icon as GuideDoc["icon"]) : "book",
-    order: int(fd.get("order"), 0, 999, 99),
-    updated: todayInBangkok(),
-    ...((TOOL_SLUGS as readonly string[]).includes(tool) ? { relatedTool: tool as ToolSlug } : {}),
-    th,
-    en,
-  };
-  await saveGuideDoc(doc);
-  refreshSite();
-  if (isNew) redirect(`/admin/guides/${slug}`);
-  return { ok: true, message: "Saved. The site is updated." };
-}
-
-export async function deleteGuide(fd: FormData): Promise<void> {
-  await requireAdmin();
-  await deleteGuideDoc(str(fd, "slug", 80));
-  refreshSite();
-  redirect("/admin/guides");
-}
-
-// ---- Diary ----
-
-export async function saveDiary(_: ActionState, fd: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const isNew = fd.get("isNew") === "1";
-  const slug = str(fd, "slug", 80).toLowerCase();
-  if (!SLUG_RE.test(slug)) return { ok: false, message: "The URL name can only use a–z, 0–9 and dashes, e.g. a-rainy-tuesday." };
-  const existing = await getDiaryDoc(slug);
-  if (isNew && existing) return { ok: false, message: "There is already a diary entry with this URL name." };
-  if (!isNew && !existing) return { ok: false, message: "This entry no longer exists." };
-
-  const date = str(fd, "date", 10);
-  if (!DATE_RE.test(date) || Number.isNaN(Date.parse(date))) return { ok: false, message: "Please pick a date." };
-  const loc = (l: "th" | "en"): DiaryLocaleDoc => ({
-    title: str(fd, `${l}.title`, 200),
-    excerpt: str(fd, `${l}.excerpt`, 600),
-    body: String(fd.get(`${l}.body`) ?? "").slice(0, 80_000),
-  });
-  const th = loc("th");
-  const en = loc("en");
-  if (!th.title || !en.title) return { ok: false, message: "Please fill in the title in both Thai and English." };
-
-  const doc: DiaryDoc = {
-    slug,
-    date,
-    dateline: { th: str(fd, "th.dateline", 120), en: str(fd, "en.dateline", 120) },
-    tags: str(fd, "tags", 300)
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean)
-      .slice(0, 10),
-    th,
-    en,
-  };
-  await saveDiaryDoc(doc);
-  refreshSite();
-  if (isNew) redirect(`/admin/diary/${slug}`);
-  return { ok: true, message: "Saved. The site is updated." };
-}
-
-export async function deleteDiary(fd: FormData): Promise<void> {
-  await requireAdmin();
-  await deleteDiaryDoc(str(fd, "slug", 80));
-  refreshSite();
-  redirect("/admin/diary");
 }

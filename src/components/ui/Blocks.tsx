@@ -10,7 +10,7 @@ function inline(text: string) {
 /** Renders the content block model used by guides, diary entries and the privacy notice. */
 export function Blocks({ blocks, noteLabel, className = "prose-may text-[17px] leading-relaxed text-ink" }: { blocks: Block[]; noteLabel?: string; className?: string }) {
   return (
-    <div className={className}>
+    <div className={className} data-blocks>
       {blocks.map((b, i) => {
         switch (b.type) {
           case "h2":
